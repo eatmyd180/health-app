@@ -1,0 +1,27 @@
+{
+  "name": "health-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@mecatoncheir/bmi": "^1.0.0",
+    "@sili3011/lifedata": "^2025.12.7-319",
+    "bcryptjs": "^3.0.3",
+    "calories-burnt": "^1.0.2",
+    "chart.js": "^4.5.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "lowdb": "^3.0.0",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.5",
+    "pdfkit": "^0.18.0",
+    "pdfmake": "^0.3.7"
+  }
+}
