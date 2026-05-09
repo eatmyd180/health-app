@@ -1,0 +1,170 @@
+    <!-- Footer untuk dashboard -->
+    <footer class="dashboard-footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="#" onclick="showAboutModal()">Tentang Kami</a>
+                <a href="#" onclick="showFAQModal()">FAQ</a>
+                <a href="#" onclick="showTermsModal()">Syarat & Ketentuan</a>
+                <a href="#" onclick="showPrivacyModal()">Kebijakan Privasi</a>
+            </div>
+            <div class="copyright">
+                <i class="far fa-copyright"></i> 2025 HealthCare+ — Platform Kesehatan Digital
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .dashboard-footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: 20px 24px;
+            margin-top: 32px;
+        }
+        .dashboard-footer .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .dashboard-footer .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-footer .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .dashboard-footer .footer-links a:hover {
+            color: #4f46e5;
+        }
+        .dashboard-footer .copyright {
+            color: var(--text-secondary);
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        @media (max-width: 600px) {
+            .dashboard-footer .footer-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+
+    <!-- Modal About Dashboard -->
+    <div id="dashboardAboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Tentang HealthCare+</h3>
+                <button class="modal-close" onclick="closeDashboardAboutModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>HealthCare+ adalah platform kesehatan digital yang membantu pengguna memantau status kesehatan mereka secara mandiri.</p>
+                <br>
+                <p><strong>Visi:</strong> Menjadi mitra kesehatan digital terpercaya bagi masyarakat Indonesia.</p>
+                <br>
+                <p><strong>Misi:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Menyediakan tools penghitungan BMI yang akurat</li>
+                    <li>Memberikan rekomendasi olahraga & nutrisi berbasis WHO</li>
+                    <li>Membantu pengguna track progress kesehatan harian</li>
+                </ul>
+                <br>
+                <p>Data kesehatan yang digunakan bersumber dari WHO (World Health Organization), ACSM, dan FAO.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" onclick="closeDashboardAboutModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboardFAQModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+                <button class="modal-close" onclick="closeDashboardFAQModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #4f46e5; margin-bottom: 8px;">❓ Apa itu HealthCare+?</h4>
+                    <p style="font-size: 13px;">HealthCare+ adalah platform kesehatan digital yang menyediakan tools penghitungan BMI, rekomendasi olahraga & nutrisi, serta tracking aktivitas harian.</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #4f46e5; margin-bottom: 8px;">❓ Apakah data saya aman?</h4>
+                    <p style="font-size: 13px;">Ya, semua data kesehatan Anda disimpan secara aman dan tidak akan dibagikan kepada pihak ketiga.</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #4f46e5; margin-bottom: 8px;">❓ Berapa biaya menggunakan HealthCare+?</h4>
+                    <p style="font-size: 13px;">Fitur dasar GRATIS selamanya. Fitur premium (grafik, export data, riwayat 30 hari) hanya Rp21.899/bulan.</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #4f46e5; margin-bottom: 8px;">❓ Apakah rekomendasi kesehatan berbasis penelitian?</h4>
+                    <p style="font-size: 13px;">Ya, semua rekomendasi kesehatan kami bersumber dari WHO (World Health Organization), ACSM, dan FAO.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" onclick="closeDashboardFAQModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboardTermsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-contract"></i> Syarat & Ketentuan</h3>
+                <button class="modal-close" onclick="closeDashboardTermsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>1. Penggunaan Layanan</strong></p>
+                <p style="font-size: 13px; margin-bottom: 12px;">HealthCare+ menyediakan layanan kesehatan digital untuk membantu pengguna memantau kesehatan. Pengguna bertanggung jawab atas data yang dimasukkan.</p>
+                <p><strong>2. Akun Premium</strong></p>
+                <p style="font-size: 13px; margin-bottom: 12px;">Fitur premium dapat diakses setelah melakukan pembayaran. Pembayaran bersifat non-refundable.</p>
+                <p><strong>3. Disclaimer Medis</strong></p>
+                <p style="font-size: 13px; margin-bottom: 12px;">HealthCare+ bukan pengganti konsultasi medis profesional. Selalu konsultasikan dengan dokter untuk kondisi kesehatan spesifik.</p>
+                <p><strong>4. Perubahan Layanan</strong></p>
+                <p style="font-size: 13px;">Kami berhak mengubah layanan dan harga sewaktu-waktu dengan pemberitahuan sebelumnya.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" onclick="closeDashboardTermsModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboardPrivacyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Kebijakan Privasi</h3>
+                <button class="modal-close" onclick="closeDashboardPrivacyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Data yang Dikumpulkan</strong></p>
+                <p style="font-size: 13px; margin-bottom: 12px;">Kami mengumpulkan nama, email, usia, berat badan, tinggi badan, dan aktivitas olahraga harian.</p>
+                <p><strong>Penggunaan Data</strong></p>
+                <p style="font-size: 13px; margin-bottom: 12px;">Data digunakan untuk menghitung BMI, memberikan rekomendasi, dan track progress kesehatan.</p>
+                <p><strong>Keamanan Data</strong></p>
+                <p style="font-size: 13px; margin-bottom: 12px;">Data disimpan dengan enkripsi dan tidak akan dibagikan ke pihak ketiga tanpa izin.</p>
+                <p><strong>Hapus Data</strong></p>
+                <p style="font-size: 13px;">Anda dapat menghapus akun dan seluruh data kapan saja dengan menghubungi support kami.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" onclick="closeDashboardPrivacyModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAboutModal() { document.getElementById('dashboardAboutModal').classList.add('active'); }
+        function closeDashboardAboutModal() { document.getElementById('dashboardAboutModal').classList.remove('active'); }
+        function showFAQModal() { document.getElementById('dashboardFAQModal').classList.add('active'); }
+        function closeDashboardFAQModal() { document.getElementById('dashboardFAQModal').classList.remove('active'); }
+        function showTermsModal() { document.getElementById('dashboardTermsModal').classList.add('active'); }
+        function closeDashboardTermsModal() { document.getElementById('dashboardTermsModal').classList.remove('active'); }
+        function showPrivacyModal() { document.getElementById('dashboardPrivacyModal').classList.add('active'); }
+        function closeDashboardPrivacyModal() { document.getElementById('dashboardPrivacyModal').classList.remove('active'); }
+    </script>

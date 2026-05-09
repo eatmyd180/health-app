@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artikel Kesehatan | HealthCare+</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        body.dark { background: #0f172a; }
+        
+        .top-bar { background: white; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
+        body.dark .top-bar { background: #1e293b; border-color: #334155; }
+        .navbar { background: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        body.dark .navbar { background: #1e293b; }
+        .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; color: #4f46e5; }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { text-decoration: none; color: #4b5563; font-weight: 500; }
+        body.dark .nav-links a { color: #94a3b8; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero h1 { font-size: 32px; font-weight: 700; background: linear-gradient(135deg, #4f46e5, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .article-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; }
+        body.dark .article-card { background: #1e293b; }
+        .article-card:hover { transform: translateY(-4px); }
+        .article-image { height: 180px; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; }
+        .article-content { padding: 20px; }
+        .category-tag { display: inline-block; background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
+        body.dark .category-tag { background: #064e3b; color: #86efac; }
+        .article-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #1f2937; }
+        body.dark .article-title { color: #f1f5f9; }
+        .article-excerpt { font-size: 13px; color: #6b7280; line-height: 1.5; }
+        body.dark .article-excerpt { color: #94a3b8; }
+        .footer { background: white; border-top: 1px solid #e2e8f0; padding: 24px; text-align: center; margin-top: 48px; }
+        body.dark .footer { background: #1e293b; }
+        @media (max-width: 640px) { .articles-grid { grid-template-columns: 1fr; } .navbar { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div><i class="fas fa-shield-alt"></i> Terpercaya & Berbasis Penelitian</div>
+        <div><a href="/dashboard" style="color:#4f46e5; text-decoration:none;"><i class="fas fa-user-circle"></i> Dashboard</a> <button class="theme-toggle" onclick="toggleTheme()" style="background:none; border:none; margin-left:12px; cursor:pointer;"><i class="fas fa-moon"></i></button></div>
+    </div>
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-heartbeat"></i><span>HealthCare+</span></div>
+        <div class="nav-links">
+            <a href="/dashboard">Beranda</a>
+            <a href="/artikel" style="color:#4f46e5;">Artikel</a>
+            <a href="/ai-chat">AI Assistant</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="hero"><h1>📚 Artikel Kesehatan</h1><p>Informasi terpercaya untuk gaya hidup sehat Anda</p></div>
+        <div class="articles-grid">
+            <div class="article-card" onclick="window.location.href='/artikel/olahraga-pagi.html'">
+                <div class="article-image"><i class="fas fa-running"></i></div>
+                <div class="article-content">
+                    <span class="category-tag">🏃 Olahraga</span>
+                    <h3 class="article-title">Berolahraga di Pagi Hari, Ini Manfaatnya</h3>
+                    <p class="article-excerpt">Olahraga pagi memiliki berbagai manfaat untuk kesehatan fisik dan mental berdasarkan penelitian terbaru...</p>
+                </div>
+            </div>
+            <div class="article-card" onclick="window.location.href='/artikel/nutrisi-seimbang.html'">
+                <div class="article-image"><i class="fas fa-apple-alt"></i></div>
+                <div class="article-content">
+                    <span class="category-tag">🍎 Nutrisi</span>
+                    <h3 class="article-title">Panduan Gizi Seimbang Rekomendasi WHO</h3>
+                    <p class="article-excerpt">Panduan lengkap gizi seimbang berdasarkan rekomendasi terbaru WHO & FAO 2025...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer"><div class="copyright">© 2025 HealthCare+ — Platform Kesehatan Digital</div></footer>
+    <script>
+        function toggleTheme() { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); }
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    </script>
+</body>
+</html>

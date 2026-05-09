@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>HealthCare+ | Platform Kesehatan Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; }
+        .main-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        .login-wrapper { display: flex; max-width: 1100px; width: 100%; background: white; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
+        .hero-section { flex: 1; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; }
+        .hero-content { color: white; }
+        .hero-logo { font-size: 48px; margin-bottom: 30px; }
+        .hero-title { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+        .hero-subtitle { font-size: 14px; opacity: 0.9; margin-bottom: 30px; }
+        .feature-list { list-style: none; margin-top: 20px; }
+        .feature-list li { margin-bottom: 14px; display: flex; align-items: center; gap: 12px; font-size: 13px; }
+        .feature-list i { width: 20px; font-size: 14px; }
+        .hero-footer { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; font-size: 12px; opacity: 0.8; }
+        .customer-service { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 40px; cursor: pointer; transition: all 0.2s; }
+        .customer-service:hover { background: rgba(255,255,255,0.25); }
+        .form-section { flex: 0.9; padding: 40px; background: white; }
+        .form-header { text-align: center; margin-bottom: 28px; }
+        .form-header h2 { font-size: 24px; font-weight: 700; color: #1f2937; margin-bottom: 6px; }
+        .form-header p { color: #6b7280; font-size: 13px; }
+        .tab-buttons { display: flex; gap: 12px; margin-bottom: 28px; background: #f3f4f6; padding: 6px; border-radius: 60px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 50px; font-weight: 600; cursor: pointer; color: #6b7280; font-size: 13px; }
+        .tab-btn.active { background: white; color: #4f46e5; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .form { display: none; }
+        .form.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .input-group { margin-bottom: 18px; }
+        .input-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; font-size: 12px; }
+        .input-group input { width: 100%; padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 14px; transition: all 0.3s; font-family: inherit; }
+        .input-group input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .password-wrapper { position: relative; width: 100%; }
+        .password-wrapper input { width: 100%; padding: 12px 40px 12px 14px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 14px; }
+        .toggle-password { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #9ca3af; }
+        .toggle-password:hover { color: #4f46e5; }
+        .btn-primary { width: 100%; padding: 12px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none; border-radius: 40px; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; margin-top: 8px; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+        .forgot-password { text-align: right; margin-top: 6px; }
+        .forgot-password a { color: #4f46e5; font-size: 11px; text-decoration: none; cursor: pointer; }
+        .error-message { color: #ef4444; font-size: 12px; margin-top: 10px; text-align: center; }
+        .success-message { color: #10b981; font-size: 12px; margin-top: 10px; text-align: center; }
+        
+        .main-footer { background: white; border-top: 1px solid #e2e8f0; padding: 20px; margin-top: auto; text-align: center; }
+        .footer-container { max-width: 1100px; margin: 0 auto; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; }
+        .footer-links a { color: #6b7280; text-decoration: none; font-size: 12px; transition: color 0.2s; cursor: pointer; }
+        .footer-links a:hover { color: #4f46e5; }
+        .copyright { color: #9ca3af; font-size: 11px; text-align: center; }
+        
+        @media (max-width: 850px) { .login-wrapper { flex-direction: column; } .hero-section { padding: 32px; } .hero-title { font-size: 28px; } .form-section { padding: 32px; } }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 24px; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; animation: modalFadeIn 0.3s ease; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-header { padding: 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; color: #1f2937; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+        .modal-body { padding: 20px; line-height: 1.6; }
+        .modal-body h4 { color: #4f46e5; margin: 20px 0 10px 0; font-size: 16px; }
+        .modal-body h4:first-child { margin-top: 0; }
+        .modal-body ul, .modal-body ol { margin-left: 20px; margin-bottom: 15px; }
+        .modal-body p { margin-bottom: 12px; }
+        .modal-footer { padding: 16px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; position: sticky; bottom: 0; z-index: 10; }
+        .modal-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; border: none; }
+        .modal-btn-primary { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; }
+        .modal-btn-secondary { background: #e2e8f0; color: #4b5563; }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="login-wrapper">
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="hero-logo"><i class="fas fa-heartbeat"></i></div>
+                <h1 class="hero-title">Your Health,<br>Our Priority</h1>
+                <p class="hero-subtitle">Comprehensive & Compassionate Care</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-chart-line"></i> Pantau BMI & berat badan</li>
+                    <li><i class="fas fa-dumbbell"></i> Rekomendasi olahraga personal</li>
+                    <li><i class="fas fa-apple-alt"></i> Saran nutrisi & makanan</li>
+                    <li><i class="fas fa-calendar-check"></i> Track aktivitas harian</li>
+                </ul>
+            </div>
+            <div class="hero-footer">
+                <div><i class="fas fa-shield-alt"></i> Data aman & terenkripsi</div>
+                <div class="customer-service" onclick="window.location.href='mailto:careurhealth.support@gmail.com'"><i class="fas fa-headset"></i> Customer Service</div>
+            </div>
+        </div>
+        <div class="form-section">
+            <div class="form-header"><h2>Selamat Datang</h2><p>Masuk atau daftar untuk memulai</p></div>
+            <div class="tab-buttons"><button class="tab-btn active" onclick="showTab('login')">Masuk</button><button class="tab-btn" onclick="showTab('register')">Daftar</button></div>
+            <div id="loginForm" class="form active">
+                <div class="input-group"><label>Email</label><input type="email" id="loginEmail" placeholder="nama@email.com"></div>
+                <div class="input-group"><label>Password</label><div class="password-wrapper"><input type="password" id="loginPassword" placeholder="********"><i class="fas fa-eye-slash toggle-password" onclick="togglePasswordVisibility('loginPassword', this)"></i></div></div>
+                <div class="forgot-password"><a onclick="showForgotPassword()">Lupa password?</a></div>
+                <button class="btn-primary" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Masuk</button>
+                <div id="loginError" class="error-message"></div>
+            </div>
+            <div id="registerForm" class="form">
+                <div class="input-group"><label>Nama Lengkap</label><input type="text" id="regName" placeholder="Budi Santoso"></div>
+                <div class="input-group"><label>Email</label><input type="email" id="regEmail" placeholder="nama@email.com"></div>
+                <div class="input-group"><label>Password</label><div class="password-wrapper"><input type="password" id="regPassword" placeholder="********"><i class="fas fa-eye-slash toggle-password" onclick="togglePasswordVisibility('regPassword', this)"></i></div></div>
+                <button class="btn-primary" onclick="doRegister()"><i class="fas fa-user-plus"></i> Daftar</button>
+                <div id="regError" class="error-message"></div><div id="regSuccess" class="success-message"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="main-footer">
+    <div class="footer-container">
+        <div class="footer-links">
+            <a href="#" onclick="showAboutModal()">Tentang Kami</a>
+            <a href="#" onclick="showFAQModal()">FAQ</a>
+            <a href="#" onclick="showTermsModal()">Syarat & Ketentuan</a>
+            <a href="#" onclick="showPrivacyModal()">Kebijakan Privasi</a>
+        </div>
+        <div class="copyright">© 2025 HealthCare+ — Platform Kesehatan Digital</div>
+    </div>
+</footer>
+
+<!-- MODALS DENGAN KONTEN PROFESIONAL -->
+<div id="aboutModal" class="modal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-info-circle"></i> Tentang HealthCare+</h3><button class="modal-close" onclick="closeAboutModal()">&times;</button></div><div class="modal-body">
+    <p><strong>HealthCare+</strong> adalah platform kesehatan digital premium yang didedikasikan untuk membantu masyarakat Indonesia menjalani gaya hidup lebih sehat dan aktif.</p>
+    <h4>🏥 Visi Kami</h4>
+    <p>Menjadi mitra kesehatan digital terpercaya nomor 1 di Indonesia yang memberikan solusi kesehatan holistik dan personal.</p>
+    <h4>🎯 Misi Kami</h4>
+    <ul><li>Menyediakan tools penghitungan BMI, BMR, dan kebutuhan kalori harian yang akurat</li><li>Memberikan rekomendasi olahraga & nutrisi berbasis WHO, ACSM, dan FAO</li><li>Membantu pengguna track progress kesehatan harian dengan grafik dan statistik lengkap</li><li>Menyediakan asisten AI 24/7 untuk konsultasi kesehatan umum</li><li>Menjaga privasi dan keamanan data pengguna dengan enkripsi tingkat enterprise</li></ul>
+    <h4>📊 Sumber Data Terpercaya</h4>
+    <p>Semua rekomendasi kesehatan di HealthCare+ bersumber dari WHO, ACSM, FAO, dan Kementerian Kesehatan Republik Indonesia.</p>
+    <h4>👨‍⚕️ Tim Ahli</h4>
+    <p>Platform kami dikembangkan dengan konsultasi dari dokter spesialis gizi klinik, ahli olahraga, dan psikolog klinis.</p>
+    <h4>📱 Fitur Unggulan</h4>
+    <ul><li>📊 Dashboard kesehatan personal</li><li>🏃 Tracking aktivitas olahraga harian</li><li>🍎 Rekomendasi menu makanan sehat</li><li>🤖 AI Health Assistant (Premium)</li><li>📈 Grafik progress berat badan & kalori</li><li>🔔 Pengingat olahraga harian</li><li>📥 Export data kesehatan (CSV)</li><li>🌓 Dark mode untuk kenyamanan mata</li></ul>
+    <h4>🔒 Keamanan Data</h4>
+    <p>HealthCare+ menggunakan enkripsi AES-256 untuk melindungi data pribadi Anda.</p>
+    <p style="text-align:center; margin-top:16px; padding-top:16px; border-top:1px solid #e2e8f0;"><strong>💚 HealthCare+ — Partner Sehat Anda 24/7</strong></p>
+</div><div class="modal-footer"><button class="modal-btn modal-btn-primary" onclick="closeAboutModal()">Tutup</button></div></div></div>
+
+<div id="faqModal" class="modal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-question-circle"></i> FAQ</h3><button class="modal-close" onclick="closeFAQModal()">&times;</button></div><div class="modal-body">
+    <div><h4>❓ Apa itu HealthCare+?</h4><p>HealthCare+ adalah platform kesehatan digital yang menyediakan tools penghitungan BMI, rekomendasi olahraga & nutrisi berbasis WHO, tracking aktivitas harian, dan asisten AI 24/7.</p></div>
+    <div><h4>❓ Apakah data saya aman?</h4><p>Ya, data Anda sangat aman. Kami menggunakan enkripsi AES-256 untuk melindungi semua data pribadi dan kesehatan Anda.</p></div>
+    <div><h4>❓ Berapa biaya Premium?</h4><p>Premium hanya Rp21.899/bulan dan Anda mendapatkan: grafik progres lengkap, export data CSV, riwayat 30 hari, AI Assistant, pengingat olahraga, dan tanpa iklan.</p></div>
+    <div><h4>❓ Apakah rekomendasi berbasis penelitian?</h4><p>Ya, semua rekomendasi bersumber dari WHO, ACSM, dan FAO.</p></div>
+    <div><h4>❓ Bagaimana cara menghitung kalori?</h4><p>Kami menggunakan metode MET (Metabolic Equivalent of Task) yang diakui secara internasional.</p></div>
+    <div><h4>❓ Apakah ada garansi uang kembali?</h4><p>Ya, jika tidak puas dengan Premium dalam 7 hari pertama, kami akan memberikan refund 100%.</p></div>
+    <div><h4>❓ Bagaimana cara menghubungi customer support?</h4><p>Hubungi kami di <strong>careurhealth.support@gmail.com</strong> atau melalui AI Assistant.</p></div>
+</div><div class="modal-footer"><button class="modal-btn modal-btn-primary" onclick="closeFAQModal()">Tutup</button></div></div></div>
+
+<div id="termsModal" class="modal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-file-contract"></i> Syarat & Ketentuan</h3><button class="modal-close" onclick="closeTermsModal()">&times;</button></div><div class="modal-body">
+    <h4>1. Penggunaan Layanan</h4><p>Pengguna bertanggung jawab penuh atas data kesehatan yang dimasukkan.</p>
+    <h4>2. Akun Premium</h4><p>Pembayaran bersifat non-refundable setelah 7 hari pertama.</p>
+    <h4>3. Pembatalan Langganan</h4><p>Dapat dibatalkan kapan saja, akses Premium berakhir di akhir periode.</p>
+    <h4>4. Disclaimer Medis</h4><p><strong>PENTING:</strong> HealthCare+ BUKAN pengganti konsultasi medis profesional.</p>
+    <h4>5. Batasan Tanggung Jawab</h4><p>HealthCare+ tidak bertanggung jawab atas cedera yang timbul dari penggunaan rekomendasi kami.</p>
+    <h4>6. Perubahan Ketentuan</h4><p>Kami berhak mengubah ketentuan sewaktu-waktu.</p>
+    <h4>7. Hukum yang Berlaku</h4><p>Diatur oleh hukum Republik Indonesia.</p>
+</div><div class="modal-footer"><button class="modal-btn modal-btn-primary" onclick="closeTermsModal()">Tutup</button></div></div></div>
+
+<div id="privacyModal" class="modal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Kebijakan Privasi</h3><button class="modal-close" onclick="closePrivacyModal()">&times;</button></div><div class="modal-body">
+    <h4>📋 Data yang Dikumpulkan</h4>
+    <ul><li>Informasi akun: Nama, email</li><li>Data kesehatan: Usia, berat, tinggi</li><li>Aktivitas olahraga: Jenis, durasi, kalori</li><li>Preferensi: Bahasa, tema, pengingat</li></ul>
+    <h4>🔒 Penggunaan Data</h4>
+    <ul><li>Menghitung BMI dan kebutuhan kalori</li><li>Memberikan rekomendasi personal</li><li>Menampilkan grafik progress</li></ul>
+    <h4>🛡️ Keamanan Data</h4><p>Enkripsi AES-256, firewall, dan deteksi intrusi.</p>
+    <h4>📤 Berbagi Data</h4><p>Kami TIDAK pernah menjual atau membagikan data Anda ke pihak ketiga.</p>
+    <h4>🗑️ Penghapusan Data</h4><p>Anda dapat meminta penghapusan data kapan saja.</p>
+    <h4>📧 Kontak</h4><p><strong>careurhealth.support@gmail.com</strong></p>
+</div><div class="modal-footer"><button class="modal-btn modal-btn-primary" onclick="closePrivacyModal()">Tutup</button></div></div></div>
+
+<div id="forgotPasswordModal" class="modal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-key"></i> Lupa Password</h3><button class="modal-close" onclick="closeForgotPasswordModal()">&times;</button></div><div class="modal-body"><p style="margin-bottom:16px;">Masukkan email Anda yang terdaftar.</p><div class="input-group"><label>Email</label><input type="email" id="resetEmail" placeholder="nama@email.com"></div><button class="btn-primary" onclick="sendResetLink()">Kirim Link Reset</button><div id="resetError" class="error-message"></div><div id="resetSuccess" class="success-message"></div></div><div class="modal-footer"><button class="modal-btn modal-btn-secondary" onclick="closeForgotPasswordModal()">Batal</button></div></div></div>
+
+<script>
+function togglePasswordVisibility(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') { input.type = 'text'; iconElement.classList.remove('fa-eye-slash'); iconElement.classList.add('fa-eye'); }
+    else { input.type = 'password'; iconElement.classList.remove('fa-eye'); iconElement.classList.add('fa-eye-slash'); }
+}
+function showTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    if (tab === 'login') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+        document.getElementById('registerForm').classList.remove('active');
+    } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('registerForm').classList.add('active');
+        document.getElementById('loginForm').classList.remove('active');
+    }
+}
+async function doLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
+    errorDiv.textContent = '';
+    if (!email || !password) { errorDiv.textContent = 'Email dan password harus diisi'; return; }
+    try {
+        const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+        const data = await res.json();
+        if (res.ok) { window.location.href = '/'; }
+        else { errorDiv.textContent = data.error === 'Email tidak terdaftar' ? '❌ Email ini belum pernah terdaftar. Silakan daftar terlebih dahulu.' : '❌ Email atau password salah. Periksa kembali data Anda.'; }
+    } catch (err) { errorDiv.textContent = 'Terjadi kesalahan. Silakan coba lagi.'; }
+}
+async function doRegister() {
+    const nama = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const errorDiv = document.getElementById('regError');
+    const successDiv = document.getElementById('regSuccess');
+    errorDiv.textContent = ''; successDiv.textContent = '';
+    if (!nama || !email || !password) { errorDiv.textContent = 'Semua field harus diisi'; return; }
+    try {
+        const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nama, email, password }) });
+        const data = await res.json();
+        if (res.ok) { successDiv.textContent = data.message; setTimeout(() => { showTab('login'); document.getElementById('loginEmail').value = email; }, 1500); }
+        else { errorDiv.textContent = data.error || 'Register gagal'; }
+    } catch (err) { errorDiv.textContent = 'Terjadi kesalahan. Silakan coba lagi.'; }
+}
+function showForgotPassword() { document.getElementById('forgotPasswordModal').classList.add('active'); }
+function closeForgotPasswordModal() { document.getElementById('forgotPasswordModal').classList.remove('active'); document.getElementById('resetEmail').value = ''; document.getElementById('resetError').textContent = ''; document.getElementById('resetSuccess').textContent = ''; }
+async function sendResetLink() {
+    const email = document.getElementById('resetEmail').value;
+    const errorDiv = document.getElementById('resetError');
+    const successDiv = document.getElementById('resetSuccess');
+    errorDiv.textContent = ''; successDiv.textContent = '';
+    if (!email) { errorDiv.textContent = 'Email harus diisi'; return; }
+    try {
+        const res = await fetch('/api/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const data = await res.json();
+        if (res.ok) { successDiv.textContent = data.message; setTimeout(() => { closeForgotPasswordModal(); }, 3000); }
+        else { errorDiv.textContent = data.error || 'Gagal mengirim link reset'; }
+    } catch (err) { errorDiv.textContent = 'Terjadi kesalahan. Silakan coba lagi.'; }
+}
+function showAboutModal() { document.getElementById('aboutModal').classList.add('active'); }
+function closeAboutModal() { document.getElementById('aboutModal').classList.remove('active'); }
+function showFAQModal() { document.getElementById('faqModal').classList.add('active'); }
+function closeFAQModal() { document.getElementById('faqModal').classList.remove('active'); }
+function showTermsModal() { document.getElementById('termsModal').classList.add('active'); }
+function closeTermsModal() { document.getElementById('termsModal').classList.remove('active'); }
+function showPrivacyModal() { document.getElementById('privacyModal').classList.add('active'); }
+function closePrivacyModal() { document.getElementById('privacyModal').classList.remove('active'); }
+</script>
+</body>
+</html>

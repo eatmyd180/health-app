@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HealthCare+ AI | Asisten Kesehatan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #e0f2fe 0%, #f0f9ff 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        body.dark { background: #0f172a; }
+        .ai-header {
+            background: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        body.dark .ai-header { background: #1e293b; border-bottom: 1px solid #334155; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+        .logo-text h1 { font-size: 20px; font-weight: 700; color: #1f2937; }
+        body.dark .logo-text h1 { color: #f1f5f9; }
+        .logo-text p { font-size: 11px; color: #6b7280; }
+        body.dark .logo-text p { color: #94a3b8; }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .lang-indicator {
+            background: #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        body.dark .lang-indicator { background: #334155; color: #f1f5f9; }
+        .theme-toggle, .close-chat {
+            background: #e2e8f0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body.dark .theme-toggle, body.dark .close-chat { background: #334155; color: #f1f5f9; }
+        .close-chat { background: #ef4444; color: white; }
+        .close-chat:hover { background: #dc2626; }
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+        .chat-panel {
+            flex: 2;
+            background: white;
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        body.dark .chat-panel { background: #1e293b; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: calc(100vh - 200px);
+        }
+        .chat-message { display: flex; gap: 12px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-message.user { justify-content: flex-end; }
+        .chat-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            flex-shrink: 0;
+        }
+        .chat-avatar.user { background: #e2e8f0; color: #4f46e5; }
+        body.dark .chat-avatar.user { background: #334155; color: #818cf8; }
+        .message-content {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .chat-message.user .message-content {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-message.bot .message-content {
+            background: #f1f5f9;
+            color: #1f2937;
+            border-bottom-left-radius: 4px;
+        }
+        body.dark .chat-message.bot .message-content { background: #0f172a; color: #f1f5f9; }
+        .message-time { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 18px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            width: fit-content;
+            border-bottom-left-radius: 4px;
+        }
+        body.dark .typing-indicator { background: #0f172a; }
+        .typing-indicator span {
+            width: 8px; height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+        .chat-input-area {
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+        body.dark .chat-input-area { background: #0f172a; border-color: #334155; }
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: white;
+            border-radius: 60px;
+            padding: 6px 6px 6px 20px;
+            border: 1px solid #e2e8f0;
+        }
+        body.dark .input-wrapper { background: #1e293b; border-color: #334155; }
+        .input-wrapper:focus-within { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .chat-input {
+            flex: 1;
+            border: none;
+            padding: 12px 0;
+            font-size: 14px;
+            background: transparent;
+            font-family: inherit;
+        }
+        .chat-input:focus { outline: none; }
+        body.dark .chat-input { color: white; }
+        .send-btn {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .suggestions-panel {
+            flex: 1;
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        body.dark .suggestions-panel { background: #1e293b; }
+        .suggestions-panel h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        body.dark .suggestions-panel h3 { color: #f1f5f9; }
+        .suggestion-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .suggestion-item {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        body.dark .suggestion-item { background: #0f172a; color: #f1f5f9; }
+        .suggestion-item:hover { background: #4f46e5; color: white; transform: translateX(5px); }
+        .disclaimer {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 10px;
+            color: #94a3b8;
+            text-align: center;
+        }
+        body.dark .disclaimer { border-color: #334155; }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .suggestions-panel { order: -1; }
+            .message-content { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ai-header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-robot"></i></div>
+            <div class="logo-text">
+                <h1 id="pageTitle">HealthCare+ AI Assistant</h1>
+                <p id="pageSubtitle">✨ 24/7 Siap Membantu Kesehatan Anda</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="lang-indicator" id="langToggle">
+                <i class="fas fa-globe"></i>
+                <span id="langText">Indonesia</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <button class="close-chat" id="closeChat"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="chat-panel">
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message bot">
+                    <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                    <div>
+                        <div class="message-content" id="welcomeMessage">
+                            👋 Halo! Saya <strong>HealthCare+ AI</strong>, asisten kesehatan pribadi Anda.<br>
+                            Saya bisa membantu menjawab pertanyaan tentang kesehatan, olahraga, nutrisi, dan gaya hidup sehat.<br><br>
+                            Ada yang bisa saya bantu hari ini?
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Ketik pertanyaan kesehatan Anda..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="suggestions-panel">
+            <h3><i class="fas fa-lightbulb"></i> <span id="suggestionsTitle">Topik Populer</span></h3>
+            <div class="suggestion-grid" id="suggestionsList"></div>
+            <div class="disclaimer" id="disclaimerText">
+                <i class="fas fa-shield-alt"></i> AI memberikan saran berbasis informasi umum. Konsultasikan ke dokter untuk masalah medis serius.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = localStorage.getItem('language') || 'id';
+        
+        const translations = {
+            id: {
+                pageTitle: 'HealthCare+ AI Assistant',
+                pageSubtitle: '✨ 24/7 Siap Membantu Kesehatan Anda',
+                langText: 'Indonesia',
+                welcomeMessage: '👋 Halo! Saya <strong>HealthCare+ AI</strong>, asisten kesehatan pribadi Anda.<br>Saya bisa membantu menjawab pertanyaan tentang kesehatan, olahraga, nutrisi, dan gaya hidup sehat.<br><br>Ada yang bisa saya bantu hari ini?',
+                inputPlaceholder: 'Ketik pertanyaan kesehatan Anda...',
+                suggestionsTitle: 'Topik Populer',
+                disclaimer: '⚠️ AI memberikan saran berbasis informasi umum. Konsultasikan ke dokter untuk masalah medis serius.',
+                suggestions: [
+                    { icon: '🏃', text: 'Olahraga pemula', query: 'Apa olahraga terbaik untuk pemula?' },
+                    { icon: '⚖️', text: 'Turunkan berat badan', query: 'Bagaimana cara menurunkan berat badan dengan aman?' },
+                    { icon: '🍳', text: 'Sarapan sehat', query: 'Menu sarapan sehat yang dianjurkan?' },
+                    { icon: '😴', text: 'Tidur berkualitas', query: 'Tips agar tidur lebih berkualitas?' },
+                    { icon: '💧', text: 'Hidrasi tubuh', query: 'Manfaat minum air putih 8 gelas sehari?' },
+                    { icon: '🧘', text: 'Manajemen stres', query: 'Cara mengurangi stres dan kecemasan?' }
+                ]
+            },
+            en: {
+                pageTitle: 'HealthCare+ AI Assistant',
+                pageSubtitle: '✨ 24/7 Ready to Help Your Health',
+                langText: 'English',
+                welcomeMessage: '👋 Hello! I am <strong>HealthCare+ AI</strong>, your personal health assistant.<br>I can help answer questions about health, exercise, nutrition, and healthy lifestyle.<br><br>How can I help you today?',
+                inputPlaceholder: 'Type your health question...',
+                suggestionsTitle: 'Popular Topics',
+                disclaimer: '⚠️ AI provides general information. Consult a doctor for serious medical issues.',
+                suggestions: [
+                    { icon: '🏃', text: 'Beginner exercise', query: 'What is the best exercise for beginners?' },
+                    { icon: '⚖️', text: 'Lose weight', query: 'How to lose weight safely?' },
+                    { icon: '🍳', text: 'Healthy breakfast', query: 'What is a recommended healthy breakfast?' },
+                    { icon: '😴', text: 'Quality sleep', query: 'Tips for better quality sleep?' },
+                    { icon: '💧', text: 'Hydration', query: 'Benefits of drinking 8 glasses of water a day?' },
+                    { icon: '🧘', text: 'Stress management', query: 'How to reduce stress and anxiety?' }
+                ]
+            }
+        };
+        
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            document.getElementById('pageTitle').innerText = t.pageTitle;
+            document.getElementById('pageSubtitle').innerText = t.pageSubtitle;
+            document.getElementById('langText').innerText = t.langText;
+            document.getElementById('welcomeMessage').innerHTML = t.welcomeMessage;
+            document.getElementById('chatInput').placeholder = t.inputPlaceholder;
+            document.getElementById('suggestionsTitle').innerHTML = '<i class="fas fa-lightbulb"></i> ' + t.suggestionsTitle;
+            document.getElementById('disclaimerText').innerHTML = '<i class="fas fa-shield-alt"></i> ' + t.disclaimer;
+            
+            const suggestionsContainer = document.getElementById('suggestionsList');
+            suggestionsContainer.innerHTML = '';
+            t.suggestions.forEach(sug => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                const iconMap = { '🏃': 'running', '⚖️': 'weight-scale', '🍳': 'apple-alt', '😴': 'moon', '💧': 'tint', '🧘': 'brain' };
+                div.innerHTML = `<i class="fas fa-${iconMap[sug.icon]}"></i> ${sug.icon} ${sug.text}`;
+                div.onclick = () => {
+                    document.getElementById('chatInput').value = sug.query;
+                    sendMessage();
+                };
+                suggestionsContainer.appendChild(div);
+            });
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messagesDiv.innerHTML += `
+                <div class="chat-message user">
+                    <div style="flex:1"></div>
+                    <div>
+                        <div class="message-content">${escapeHtml(message)}</div>
+                        <div class="message-time" style="text-align:right">${time}</div>
+                    </div>
+                    <div class="chat-avatar user"><i class="fas fa-user"></i></div>
+                </div>
+            `;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            input.value = '';
+            
+            const loadingId = 'loading-' + Date.now();
+            messagesDiv.innerHTML += `
+                <div class="chat-message bot" id="${loadingId}">
+                    <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                    <div><div class="typing-indicator"><span></span><span></span><span></span></div></div>
+                </div>
+            `;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, forceLanguage: currentLanguage === 'id' ? 'id' : 'en' })
+                });
+                const data = await response.json();
+                document.getElementById(loadingId)?.remove();
+                const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                if (response.ok && data.success) {
+                    messagesDiv.innerHTML += `
+                        <div class="chat-message bot">
+                            <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                            <div>
+                                <div class="message-content">${escapeHtml(data.response)}</div>
+                                <div class="message-time">${responseTime}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    messagesDiv.innerHTML += `
+                        <div class="chat-message bot">
+                            <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                            <div>
+                                <div class="message-content" style="background:#fee2e2; color:#ef4444;">${escapeHtml(data.error || 'Terjadi kesalahan. Silakan coba lagi.')}</div>
+                                <div class="message-time">${responseTime}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById(loadingId)?.remove();
+                const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messagesDiv.innerHTML += `
+                    <div class="chat-message bot">
+                        <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <div class="message-content" style="background:#fee2e2; color:#ef4444;">Terjadi kesalahan. Silakan coba lagi.</div>
+                            <div class="message-time">${responseTime}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/\n/g, '<br>');
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+        
+        function loadTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+            }
+        }
+        
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('closeChat').addEventListener('click', () => {
+            window.location.href = '/dashboard';
+        });
+        document.getElementById('langToggle').addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'id' ? 'en' : 'id';
+            localStorage.setItem('language', currentLanguage);
+            updateLanguage();
+        });
+        
+        loadTheme();
+        updateLanguage();
+    </script>
+</body>
+</html>
