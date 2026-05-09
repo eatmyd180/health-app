@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>HealthCare+ | Dashboard</title>
+    <meta name="description" content="HealthCare+ - Advanced health tracking with BMI, WHtR, body fat analysis, and AI assistant.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f8; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
+        body.dark { background: #0f172a; }
+        
+        /* Sidebar */
+        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: white; z-index: 1000; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; }
+        body.dark .sidebar { background: #1e293b; }
+        .sidebar.open { left: 0; }
+        .sidebar-header { padding: 24px 20px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        body.dark .sidebar-header { border-color: #334155; }
+        .sidebar-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 36px; color: white; cursor: pointer; position: relative; overflow: hidden; }
+        .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-upload-btn { position: absolute; bottom: 0; right: 0; background: #4f46e5; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: 2px solid white; }
+        .sidebar-name { font-size: 18px; font-weight: 700; color: #1f2937; }
+        body.dark .sidebar-name { color: #f1f5f9; }
+        .sidebar-email { font-size: 12px; color: #6b7280; margin-top: 4px; }
+        body.dark .sidebar-email { color: #94a3b8; }
+        .sidebar-menu { padding: 16px 0; }
+        .sidebar-item { display: flex; align-items: center; gap: 14px; padding: 14px 24px; cursor: pointer; transition: all 0.2s; color: #4b5563; font-size: 14px; font-weight: 500; }
+        body.dark .sidebar-item { color: #94a3b8; }
+        .sidebar-item:hover { background: #f1f5f9; color: #4f46e5; }
+        body.dark .sidebar-item:hover { background: #0f172a; color: #818cf8; }
+        .sidebar-item i { width: 24px; font-size: 18px; }
+        .sidebar-item.logout { margin-top: 20px; border-top: 1px solid #e2e8f0; color: #ef4444; }
+        body.dark .sidebar-item.logout { border-color: #334155; }
+        
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .sidebar-overlay.active { display: block; }
+        
+        /* Navbar */
+        .navbar { background: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        body.dark .navbar { background: #1e293b; }
+        .menu-toggle { background: none; border: none; font-size: 24px; cursor: pointer; color: #4f46e5; }
+        .logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #4f46e5; }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .theme-toggle { background: #e2e8f0; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; }
+        body.dark .theme-toggle { background: #334155; color: #f1f5f9; }
+        
+        /* Container */
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; flex: 1; }
+        
+        /* Warning Card */
+        .warning-card { border-radius: 20px; padding: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .warning-card i { font-size: 28px; }
+        .warning-card .warning-content { flex: 1; }
+        .warning-card .warning-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .warning-card .warning-text { font-size: 12px; opacity: 0.9; }
+        .warning-underweight { background: #dbeafe; border-left: 4px solid #2563eb; color: #1e3a8a; }
+        .warning-normal { background: #dcfce7; border-left: 4px solid #16a34a; color: #14532d; }
+        .warning-overweight { background: #fed7aa; border-left: 4px solid #ea580c; color: #7c2d12; }
+        .warning-obese { background: #fee2e2; border-left: 4px solid #dc2626; color: #991b1b; }
+        body.dark .warning-underweight { background: #1e3a5f; color: #bfdbfe; }
+        body.dark .warning-normal { background: #064e3b; color: #bbf7d0; }
+        body.dark .warning-overweight { background: #7c2d12; color: #fed7aa; }
+        body.dark .warning-obese { background: #7f1d1d; color: #fecaca; }
+        
+        /* Form Card */
+        .form-card { background: white; border-radius: 24px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        body.dark .form-card { background: #1e293b; }
+        .form-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #1f2937; display: flex; align-items: center; gap: 8px; }
+        body.dark .form-card h2 { color: #f1f5f9; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #4b5563; margin-bottom: 6px; }
+        body.dark .form-group label { color: #94a3b8; }
+        .form-group input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 14px; font-family: inherit; transition: all 0.3s; background: white; }
+        body.dark .form-group input { background: #0f172a; border-color: #334155; color: white; }
+        .form-group input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .btn-save { width: 100%; padding: 14px; background: linear-gradient(135deg, #4f46e5, #7c3aed); border: none; border-radius: 40px; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+        
+        /* Goal Toggle */
+        .goal-toggle { display: flex; gap: 12px; margin-bottom: 20px; background: #f1f5f9; padding: 6px; border-radius: 60px; }
+        body.dark .goal-toggle { background: #0f172a; }
+        .goal-btn { flex: 1; padding: 10px; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s; }
+        .goal-btn.active { background: white; color: #4f46e5; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        body.dark .goal-btn.active { background: #1e293b; color: #818cf8; }
+        
+        /* Prediction Card */
+        .prediction-card { background: linear-gradient(135deg, #e0f2fe, #f0f9ff); border-radius: 20px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #0ea5e9; }
+        body.dark .prediction-card { background: #0f172a; border-left-color: #38bdf8; }
+        .prediction-title { font-size: 13px; font-weight: 600; color: #0284c7; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        body.dark .prediction-title { color: #7dd3fc; }
+        .prediction-value { font-size: 24px; font-weight: 800; color: #0f172a; }
+        body.dark .prediction-value { color: #f1f5f9; }
+        .prediction-detail { font-size: 11px; color: #475569; margin-top: 8px; }
+        body.dark .prediction-detail { color: #94a3b8; }
+        
+        /* Suggestion Card */
+        .suggestion-card { background: #fef3c7; border-radius: 20px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #f59e0b; }
+        body.dark .suggestion-card { background: #7c2d12; border-left-color: #fbbf24; }
+        .suggestion-title { font-size: 13px; font-weight: 600; color: #d97706; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        body.dark .suggestion-title { color: #fcd34d; }
+        .suggestion-text { font-size: 12px; color: #92400e; line-height: 1.5; }
+        body.dark .suggestion-text { color: #fde68a; }
+        
+        /* Cards lainnya */
+        .quote-card { background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 20px; padding: 20px; color: white; margin-bottom: 20px; }
+        .quote-text { font-size: 14px; font-style: italic; line-height: 1.5; }
+        .quote-author { font-size: 12px; opacity: 0.8; margin-top: 8px; text-align: right; }
+        .welcome-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .welcome-text h1 { font-size: 20px; font-weight: 700; color: #1f2937; }
+        body.dark .welcome-text h1 { color: #f1f5f9; }
+        .streak-card { background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 8px 16px; border-radius: 20px; text-align: center; }
+        .streak-number { font-size: 24px; font-weight: 800; color: #92400e; }
+        .streak-label { font-size: 10px; color: #b45309; }
+        .badges-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .badge-card { background: white; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex: 1; min-width: 120px; }
+        body.dark .badge-card { background: #1e293b; }
+        .badge-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .badge-icon.fire { background: #fef3c7; color: #f59e0b; }
+        .badge-icon.calorie { background: #dcfce7; color: #10b981; }
+        .badge-info h4 { font-size: 18px; font-weight: 700; color: #1f2937; }
+        body.dark .badge-info h4 { color: #f1f5f9; }
+        .badge-info p { font-size: 10px; color: #6b7280; }
+        .progress-section { background: white; border-radius: 20px; padding: 16px; margin-bottom: 16px; }
+        body.dark .progress-section { background: #1e293b; }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+        .progress-bar-container { background: #e2e8f0; border-radius: 10px; height: 8px; overflow: hidden; }
+        .progress-bar-fill { background: linear-gradient(135deg, #4f46e5, #7c3aed); height: 100%; width: 0%; transition: width 0.5s; }
+        .target-set { font-size: 11px; color: #6b7280; margin-top: 8px; text-align: right; }
+        .target-set span { cursor: pointer; color: #4f46e5; }
+        .summary-card { background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 20px; padding: 16px; color: white; margin-bottom: 16px; }
+        .summary-stats { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; }
+        .summary-stat { text-align: center; flex: 1; }
+        .summary-stat .value { font-size: 24px; font-weight: 800; }
+        .summary-stat .label { font-size: 10px; opacity: 0.8; }
+        .card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 16px; }
+        body.dark .card { background: #1e293b; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+        .card-header h2 { font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 8px; }
+        body.dark .card-header h2 { color: #f1f5f9; }
+        .bmi-box { text-align: center; background: #f8fafc; border-radius: 16px; padding: 14px; margin-bottom: 14px; }
+        body.dark .bmi-box { background: #0f172a; }
+        .bmi-value { font-size: 42px; font-weight: 800; }
+        .bmi-status { display: inline-block; padding: 4px 12px; border-radius: 40px; font-size: 11px; font-weight: 600; margin-top: 6px; }
+        .metrics-grid { display: flex; gap: 12px; margin-bottom: 14px; }
+        .metric-card { flex: 1; background: #f8fafc; border-radius: 14px; padding: 10px; text-align: center; }
+        body.dark .metric-card { background: #0f172a; }
+        .metric-label { font-size: 10px; color: #6b7280; margin-bottom: 4px; }
+        .metric-value { font-size: 16px; font-weight: 700; color: #1f2937; }
+        body.dark .metric-value { color: #f1f5f9; }
+        .research-note { background: #eff6ff; border-radius: 12px; padding: 10px; font-size: 10px; border-left: 3px solid #4f46e5; margin-bottom: 12px; }
+        body.dark .research-note { background: #0f172a; color: #94a3b8; }
+        .rekom-box { background: #f8fafc; border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+        body.dark .rekom-box { background: #0f172a; }
+        .rekom-box p { font-size: 12px; margin-bottom: 6px; color: #1f2937; }
+        body.dark .rekom-box p { color: #e2e8f0; }
+        .rekom-box .small-text { font-size: 11px; color: #6b7280; }
+        .btn-secondary { width: 100%; padding: 10px; background: #e2e8f0; border: none; border-radius: 40px; cursor: pointer; margin-top: 10px; font-weight: 500; }
+        body.dark .btn-secondary { background: #334155; color: #f1f5f9; }
+        .exercise-card { background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 20px; padding: 20px; color: white; margin-bottom: 16px; }
+        .exercise-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .exercise-input-group { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .exercise-input-group input { flex: 1; padding: 12px 16px; border: none; border-radius: 40px; background: rgba(255,255,255,0.2); color: white; }
+        .exercise-input-group input::placeholder { color: rgba(255,255,255,0.7); }
+        .exercise-btn { width: 100%; padding: 12px; background: white; border: none; border-radius: 40px; color: #4f46e5; font-weight: 600; cursor: pointer; }
+        .today-status { background: #dcfce7; border-radius: 14px; padding: 12px; text-align: center; margin-bottom: 12px; color: #166534; font-weight: 600; font-size: 13px; }
+        body.dark .today-status { background: #064e3b; color: #86efac; }
+        .today-status span { display: block; font-size: 11px; margin-top: 6px; font-weight: normal; }
+        .history-list { max-height: 300px; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-size: 12px; flex-wrap: wrap; gap: 6px; }
+        body.dark .history-item { border-color: #334155; color: #e2e8f0; }
+        .feature-card { background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 20px; padding: 16px; margin-bottom: 16px; border: 1px solid #f59e0b; }
+        .feature-card h2 { color: #92400e; font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .feature-card .feature-content { background: rgba(255,255,255,0.7); border-radius: 16px; padding: 12px; margin-bottom: 12px; }
+        .feature-card .feature-content p { color: #92400e; font-size: 13px; margin-bottom: 8px; }
+        body.dark .feature-card { background: #7c2d12; }
+        body.dark .feature-card .feature-content { background: rgba(0,0,0,0.3); }
+        body.dark .feature-card .feature-content p { color: #fcd34d; }
+        .chart-container { margin: 20px 0; position: relative; height: 200px; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 10px 18px; border-radius: 40px; font-size: 12px; z-index: 1100; }
+        
+        /* Tombol Export PDF */
+        .btn-export-pdf {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+        }
+        .btn-export-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239,68,68,0.4);
+        }
+        .btn-export-pdf i {
+            font-size: 14px;
+        }
+        
+        /* Modal Styles - Improved */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 28px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        body.dark .modal-content { background: #1e293b; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; border-radius: 28px 28px 0 0; }
+        body.dark .modal-header { background: #1e293b; border-color: #334155; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; color: #1f2937; }
+        body.dark .modal-header h3 { color: #f1f5f9; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; transition: color 0.2s; }
+        .modal-close:hover { color: #4f46e5; }
+        .modal-body { padding: 20px 24px; line-height: 1.6; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; position: sticky; bottom: 0; background: white; z-index: 10; border-radius: 0 0 28px 28px; }
+        body.dark .modal-footer { background: #1e293b; border-color: #334155; }
+        .modal-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .modal-btn-primary { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; }
+        .modal-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+        .modal-btn-secondary { background: #e2e8f0; color: #4b5563; }
+        .modal-btn-secondary:hover { background: #cbd5e1; }
+        body.dark .modal-btn-secondary { background: #334155; color: #f1f5f9; }
+        
+        /* Setting Items */
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #e2e8f0; }
+        body.dark .setting-item { border-color: #334155; }
+        .setting-label { font-size: 14px; font-weight: 500; color: #1f2937; display: flex; align-items: center; gap: 10px; }
+        body.dark .setting-label { color: #f1f5f9; }
+        .setting-value select { padding: 8px 12px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; cursor: pointer; }
+        body.dark .setting-value select { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+        
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: 0.3s; border-radius: 34px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: #4f46e5; }
+        input:checked + .toggle-slider:before { transform: translateX(24px); }
+        
+        /* Time Select */
+        .time-select-group { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+        .time-select-group select { padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 14px; cursor: pointer; }
+        body.dark .time-select-group select { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+        
+        /* WHtR Input Card */
+        .whr-input-card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 16px; border: 2px dashed #4f46e5; }
+        body.dark .whr-input-card { background: #1e293b; border-color: #818cf8; }
+        .whr-input-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .whr-input-group { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .whr-input-group .form-group { flex: 1; margin-bottom: 0; }
+        .whr-input-group button { margin-bottom: 0; }
+        
+        /* Info Row */
+        .info-row { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .info-label { font-size: 13px; color: #6b7280; font-weight: 500; }
+        .info-value { font-size: 14px; font-weight: 600; color: #1f2937; }
+        body.dark .info-value { color: #f1f5f9; }
+        
+        /* Footer */
+        .footer { background: white; border-top: 1px solid #e2e8f0; padding: 24px 20px; text-align: center; margin-top: auto; }
+        body.dark .footer { background: #1e293b; border-color: #334155; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 16px; }
+        .footer-links a { color: #6b7280; text-decoration: none; font-size: 12px; cursor: pointer; transition: color 0.2s; }
+        .footer-links a:hover { color: #4f46e5; }
+        body.dark .footer-links a { color: #94a3b8; }
+        .footer-disclaimer { font-size: 10px; color: #9ca3af; max-width: 600px; margin: 12px auto 0; line-height: 1.5; }
+        body.dark .footer-disclaimer { color: #64748b; }
+        .footer-sources { font-size: 9px; color: #a0aec0; margin-top: 8px; }
+        .copyright { font-size: 11px; color: #9ca3af; margin-top: 12px; }
+        
+        @media (max-width: 550px) { .container { padding: 12px; } .badges-row { flex-direction: column; } .chart-container { height: 180px; } .whr-input-group { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" id="avatarContainer" onclick="document.getElementById('avatarInput').click()">
+                <i class="fas fa-user-circle" id="avatarIcon"></i>
+                <img id="avatarImg" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                <div class="avatar-upload-btn"><i class="fas fa-camera"></i></div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/jpg" style="display:none" onchange="uploadAvatar(this)">
+            <div class="sidebar-name" id="sidebarName">Loading...</div>
+            <div class="sidebar-email" id="sidebarEmail">email@example.com</div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item" onclick="openProfileModal(); closeSidebar()"><i class="fas fa-user"></i> <span id="menuProfile">My Profile</span></div>
+            <div class="sidebar-item" onclick="openSettingsModal(); closeSidebar()"><i class="fas fa-sliders-h"></i> <span id="menuSettings">Settings</span></div>
+            <div class="sidebar-item" onclick="setTargetModal(); closeSidebar()"><i class="fas fa-bullseye"></i> <span id="menuTarget">Daily Target</span></div>
+            <div class="sidebar-item" onclick="openReminderSettings(); closeSidebar()"><i class="fas fa-bell"></i> <span id="menuReminder">Reminder</span></div>
+            <div class="sidebar-item" onclick="window.location.href='/artikel'"><i class="fas fa-newspaper"></i> <span id="menuArtikel">Health Articles</span></div>
+            <div class="sidebar-item" onclick="openAIChat(); closeSidebar()"><i class="fas fa-robot"></i> <span id="menuAI">AI Assistant</span></div>
+            <div class="sidebar-item logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="menuLogout">Logout</span></div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="logo"><i class="fas fa-heartbeat"></i><span>HealthCare+</span></div>
+        <div class="nav-right">
+            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="container" id="mainContent"></div>
+
+    <!-- PROFILE MODAL -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="profileModalTitle"><i class="fas fa-user-circle"></i> My Profile</h3>
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-row"><span class="info-label" id="profileNameLabel">Name:</span> <span id="profileName">-</span></div>
+                <div class="info-row"><span class="info-label" id="profileEmailLabel">Email:</span> <span id="profileEmail">-</span></div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="profileCloseBtn" onclick="closeProfileModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="settingsModalTitle"><i class="fas fa-sliders-h"></i> Settings</h3>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <span class="setting-label" id="darkModeLabel"><i class="fas fa-moon"></i> Dark Mode</span>
+                    <label class="toggle-switch"><input type="checkbox" id="darkModeToggle" onchange="toggleTheme()"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label" id="languageLabel"><i class="fas fa-language"></i> Language</span>
+                    <div class="setting-value">
+                        <select id="languageSelect" onchange="changeLanguage()">
+                            <option value="id">🇮🇩 Indonesia</option>
+                            <option value="en">🇬🇧 English</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" id="settingsSaveBtn" onclick="closeSettingsModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TARGET MODAL -->
+    <div id="targetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="targetModalTitle"><i class="fas fa-bullseye"></i> Daily Calorie Target</h3>
+                <button class="modal-close" onclick="closeTargetModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="targetModalDesc">How many calories do you want to burn per day?</p>
+                <div class="form-group" style="margin-top:16px;">
+                    <input type="number" id="targetCalories" style="width:100%; padding:14px; border-radius:16px; border:1px solid #e2e8f0;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="targetCancelBtn" onclick="closeTargetModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="targetSaveBtn" onclick="saveTarget()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REMINDER MODAL - Improved -->
+    <div id="reminderSettingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="reminderModalTitle"><i class="fas fa-bell"></i> Exercise Reminder</h3>
+                <button class="modal-close" onclick="closeReminderModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <span class="setting-label" id="reminderStatusLabel"><i class="fas fa-power-off"></i> Reminder Status</span>
+                    <label class="toggle-switch"><input type="checkbox" id="reminderToggleSwitch"><span class="toggle-slider"></span></label>
+                </div>
+                <div id="reminderTimeSection">
+                    <div class="time-select-group">
+                        <span id="reminderTimeLabel" style="font-weight:500;">Time</span>
+                        <select id="reminderHourSelect" style="flex:1;"></select>
+                        <span>:</span>
+                        <select id="reminderMinuteSelect" style="flex:1;"></select>
+                    </div>
+                </div>
+                <div id="reminderDisabledMessage" style="text-align:center; padding:20px; color:#6b7280; display:none;">
+                    <i class="fas fa-bell-slash"></i> <span id="reminderDisabledText">Reminder is off. Enable to set time.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="reminderCancelBtn" onclick="closeReminderModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="reminderSaveBtn" onclick="saveReminderSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="paymentTitle"><i class="fas fa-receipt"></i> Payment Invoice</h3>
+                <button class="modal-close" onclick="closePaymentModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="paymentModalBody"><p style="text-align:center;">Processing payment...</p></div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="paymentCloseBtn" onclick="closePaymentModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ MODAL -->
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> <span id="faqTitle">FAQ</span></h3>
+                <button class="modal-close" onclick="closeFaqModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="faqBody"></div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" id="faqCloseBtn" onclick="closeFaqModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT MODAL -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> <span id="aboutTitle">About HealthCare+</span></h3>
+                <button class="modal-close" onclick="closeAboutModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="aboutBody"></div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" id="aboutCloseBtn" onclick="closeAboutModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TERMS MODAL -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-contract"></i> <span id="termsTitle">Terms & Conditions</span></h3>
+                <button class="modal-close" onclick="closeTermsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="termsBody"></div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" id="termsCloseBtn" onclick="closeTermsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRIVACY MODAL -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> <span id="privacyTitle">Privacy Policy</span></h3>
+                <button class="modal-close" onclick="closePrivacyModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="privacyBody"></div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" id="privacyCloseBtn" onclick="closePrivacyModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHtR MODAL -->
+    <div id="whrModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="whrModalTitle"><i class="fas fa-tape"></i> Waist Circumference</h3>
+                <button class="modal-close" onclick="closeWHRModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="whrModalDesc">Measure your waist at belly button level and enter the value below.</p>
+                <div class="form-group">
+                    <label id="whrLabel">Waist (cm)</label>
+                    <input type="number" id="lingkarPinggang" step="0.1" placeholder="Example: 85">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="whrCancelBtn" onclick="closeWHRModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="whrSaveBtn" onclick="saveWaist()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="#" onclick="showAboutModal()" id="footerAbout">About Us</a>
+            <a href="#" onclick="showFaqModal()" id="footerFaq">FAQ</a>
+            <a href="#" onclick="showTermsModal()" id="footerTerms">Terms</a>
+            <a href="#" onclick="showPrivacyModal()" id="footerPrivacy">Privacy</a>
+        </div>
+        <div class="footer-disclaimer" id="footerDisclaimer">
+            <i class="fas fa-shield-alt"></i> <strong>Medical Disclaimer:</strong> Information provided is for educational purposes only. 
+            HealthCare+ is NOT a substitute for professional medical consultation.
+        </div>
+        <div class="footer-sources" id="footerSources">
+            Sources: WHO, ACSM, FAO, CDC, The Lancet
+        </div>
+        <div class="copyright" id="footerCopyright">
+            © 2025 HealthCare+ — Digital Health Platform
+        </div>
+    </div>
+
+    <script>
+        // ========== QUOTES ==========
+        const quotes = [
+            { text: "The greatest wealth is health.", author: "Virgil" },
+            { text: "To keep the body in good health is a duty...", author: "Buddha" },
+            { text: "Health is not valued until sickness comes.", author: "Thomas Fuller" },
+            { text: "It is health that is real wealth.", author: "Mahatma Gandhi" },
+            { text: "The first wealth is health.", author: "Ralph Waldo Emerson" },
+            { text: "Take care of your body. It's the only place you have to live.", author: "Jim Rohn" },
+            { text: "Early to bed and early to rise makes a man healthy.", author: "Benjamin Franklin" }
+        ];
+
+        let currentQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        let currentGoal = localStorage.getItem('healthGoal') || 'lose';
+        
+        // ========== TRANSLATIONS ==========
+        let currentLanguage = localStorage.getItem('language') || 'id';
+        let userData = null;
+        let healthChart = null;
+        let caloriesChart = null;
+        let dailyTarget = localStorage.getItem('dailyTarget') ? parseInt(localStorage.getItem('dailyTarget')) : 500;
+        let reminderHour = parseInt(localStorage.getItem('reminderHour')) || 19;
+        let reminderMinute = parseInt(localStorage.getItem('reminderMinute')) || 0;
+        let reminderEnabled = localStorage.getItem('reminderEnabled') !== 'false';
+        
+        const translations = {
+            id: {
+                menuProfile: "Profil Saya", menuSettings: "Pengaturan", menuTarget: "Target Harian",
+                menuReminder: "Pengingat", menuArtikel: "Artikel Kesehatan", menuAI: "AI Assistant",
+                menuLogout: "Keluar", loading: "Memuat dashboard...",
+                hello: "Halo", dataBased: "Data berbasis WHO & ACSM", bestStreak: "Streak Terbaik",
+                caloriesThisMonth: "Kalori Bulan Ini", progressToday: "Progress Hari Ini", change: "ubah",
+                dailyTarget: "Target harian", calories: "kalori", summaryThisMonth: "Ringkasan Bulan Ini",
+                exerciseDays: "Hari Olahraga", caloriesBurned: "Kalori Terbakar", averagePerDay: "Rata-rata/hari",
+                healthStatus: "Status Kesehatan", source: "Sumber", editData: "Edit Data",
+                exerciseRecommendation: "Rekomendasi Olahraga", exercise: "Olahraga", frequency: "Frekuensi",
+                tip: "Tips", nutritionRecommendation: "Rekomendasi Nutrisi", breakfast: "Sarapan",
+                lunch: "Makan Siang", dinner: "Makan Malam", todayActivity: "Aktivitas Hari Ini",
+                checkin: "Absen", history: "Riwayat", noData: "Belum ada data", weight: "Berat", height: "Tinggi",
+                minutes: "menit", fromTarget: "dari target", editDataBtn: "Edit Data", save: "Simpan",
+                exercisePlaceholder: "Olahraga", durationPlaceholder: "menit", notePlaceholder: "Catatan",
+                checkinButton: "Absen", addActivityButton: "Tambah aktivitas", todayCheckin: "Hari ini:",
+                exportCSV: "Export PDF", profileTitle: "Profil Saya", profileNameLabel: "Nama:", profileEmailLabel: "Email:", profileCloseBtn: "Tutup",
+                settingsTitle: "Pengaturan", darkModeLabel: "Mode Gelap", languageLabel: "Bahasa", settingsSaveBtn: "Simpan",
+                targetTitle: "Target Kalori Harian", targetModalDesc: "Berapa target kalori per hari?", targetCancelBtn: "Batal", targetSaveBtn: "Simpan",
+                reminderModalTitle: "Pengingat Olahraga", reminderStatusLabel: "Status Pengingat", reminderTimeLabel: "Waktu", reminderCancelBtn: "Batal", reminderSaveBtn: "Simpan",
+                paymentTitle: "Invoice Pembayaran", paymentCloseBtn: "Tutup",
+                faqTitle: "FAQ", faqCloseBtn: "Tutup", aboutTitle: "Tentang HealthCare+", aboutCloseBtn: "Tutup",
+                termsTitle: "Syarat & Ketentuan", termsCloseBtn: "Tutup", privacyTitle: "Kebijakan Privasi", privacyCloseBtn: "Tutup",
+                footerAbout: "Tentang Kami", footerFaq: "FAQ", footerTerms: "Syarat", footerPrivacy: "Privasi", footerCopyright: "© 2025 HealthCare+ — Platform Kesehatan Digital",
+                age: "Usia", agePlaceholder: "Contoh: 25",
+                loseWeight: "Turunkan Berat Badan", gainWeight: "Naikkan Berat Badan",
+                weightLossPrediction: "Perkiraan Penurunan Berat Badan", weightGainPrediction: "Perkiraan Kenaikan Berat Badan",
+                weeklyPrediction: "Jika konsisten, dalam 1 minggu Anda bisa", monthlyPrediction: "Dalam 1 bulan (4 minggu) Anda bisa",
+                tipsLose: "Tips Menurunkan Berat Badan", tipsGain: "Tips Menaikkan Berat Badan",
+                calorieInfo: "Target defisit/surplus kalori harian Anda adalah",
+                weeklyCaloriesTrend: "Tren Kalori Mingguan", weightProgress: "Progress Berat Badan",
+                warningUnderweight: "Perhatian: Berat Badan Kurus",
+                warningUnderweightText: "Anda tergolong kurus. Risiko kekurangan gizi, osteoporosis, anemia.",
+                warningNormal: "Berat Badan Ideal",
+                warningNormalText: "Berat badan Anda ideal. Pertahankan dengan pola makan seimbang.",
+                warningOverweight: "Peringatan: Kelebihan Berat Badan",
+                warningOverweightText: "Anda tergolong kelebihan berat badan. Risiko penyakit jantung meningkat.",
+                warningObese: "PERINGATAN SERIUS: Obesitas",
+                warningObeseText: "Anda tergolong obesitas. Risiko tinggi penyakit jantung, stroke, diabetes.",
+                whtrTitle: "Rasio Pinggang-Tinggi (WHtR)",
+                whtrIdeal: "Ideal", whtrHigh: "Tinggi", whtrVeryHigh: "Sangat Tinggi",
+                whtrRiskLow: "Risiko rendah terhadap penyakit metabolik.",
+                whtrRiskHigh: "⚠️ Risiko meningkat. Perhatikan pola makan dan perbanyak olahraga.",
+                whtrRiskVeryHigh: "🚨 Risiko tinggi terhadap penyakit jantung, diabetes, dan hipertensi.",
+                whtrInputTitle: "Masukkan Lingkar Pinggang",
+                whtrInputDesc: "Ukur lingkar pinggang Anda setinggi pusar.",
+                whtrLabel: "Lingkar Pinggang (cm)",
+                whtrCancel: "Batal", whtrSave: "Simpan", whtrUpdate: "Update Lingkar Pinggang",
+                reminderDisabledText: "Pengingat dimatikan. Aktifkan untuk mengatur waktu.",
+                reminderEnabledText: "Pengingat diaktifkan", reminderDisabledTextShort: "Pengingat dimatikan"
+            },
+            en: {
+                menuProfile: "My Profile", menuSettings: "Settings", menuTarget: "Daily Target",
+                menuReminder: "Reminder", menuArtikel: "Health Articles", menuAI: "AI Assistant",
+                menuLogout: "Logout", loading: "Loading dashboard...",
+                hello: "Hello", dataBased: "Data based on WHO & ACSM", bestStreak: "Best Streak",
+                caloriesThisMonth: "Calories This Month", progressToday: "Today's Progress", change: "change",
+                dailyTarget: "Daily target", calories: "calories", summaryThisMonth: "Monthly Summary",
+                exerciseDays: "Exercise Days", caloriesBurned: "Calories Burned", averagePerDay: "Average/day",
+                healthStatus: "Health Status", source: "Source", editData: "Edit Data",
+                exerciseRecommendation: "Exercise Recommendation", exercise: "Exercise", frequency: "Frequency",
+                tip: "Tip", nutritionRecommendation: "Nutrition Recommendation", breakfast: "Breakfast",
+                lunch: "Lunch", dinner: "Dinner", todayActivity: "Today's Activity", checkin: "Check-in",
+                history: "History", noData: "No data yet", weight: "Weight", height: "Height",
+                minutes: "minutes", fromTarget: "of target", editDataBtn: "Edit Data", save: "Save",
+                exercisePlaceholder: "Exercise", durationPlaceholder: "minutes", notePlaceholder: "Note",
+                checkinButton: "Check-in", addActivityButton: "Add activity", todayCheckin: "Today:",
+                exportCSV: "Export PDF", profileTitle: "My Profile", profileNameLabel: "Name:", profileEmailLabel: "Email:", profileCloseBtn: "Close",
+                settingsTitle: "Settings", darkModeLabel: "Dark Mode", languageLabel: "Language", settingsSaveBtn: "Save",
+                targetTitle: "Daily Calorie Target", targetModalDesc: "How many calories per day?", targetCancelBtn: "Cancel", targetSaveBtn: "Save",
+                reminderModalTitle: "Exercise Reminder", reminderStatusLabel: "Reminder Status", reminderTimeLabel: "Time", reminderCancelBtn: "Cancel", reminderSaveBtn: "Save",
+                paymentTitle: "Payment Invoice", paymentCloseBtn: "Close",
+                faqTitle: "FAQ", faqCloseBtn: "Close", aboutTitle: "About HealthCare+", aboutCloseBtn: "Close",
+                termsTitle: "Terms & Conditions", termsCloseBtn: "Close", privacyTitle: "Privacy Policy", privacyCloseBtn: "Close",
+                footerAbout: "About Us", footerFaq: "FAQ", footerTerms: "Terms", footerPrivacy: "Privacy", footerCopyright: "© 2025 HealthCare+ — Digital Health Platform",
+                age: "Age", agePlaceholder: "Example: 25",
+                loseWeight: "Lose Weight", gainWeight: "Gain Weight",
+                weightLossPrediction: "Estimated Weight Loss", weightGainPrediction: "Estimated Weight Gain",
+                weeklyPrediction: "If consistent, in 1 week you can", monthlyPrediction: "In 1 month (4 weeks) you can",
+                tipsLose: "Tips to Lose Weight", tipsGain: "Tips to Gain Weight",
+                calorieInfo: "Your daily calorie deficit/surplus target is",
+                weeklyCaloriesTrend: "Weekly Calories Trend", weightProgress: "Weight Progress",
+                warningUnderweight: "Warning: Underweight",
+                warningUnderweightText: "You are underweight. Risk of malnutrition, osteoporosis, anemia.",
+                warningNormal: "Ideal Weight",
+                warningNormalText: "Your weight is ideal. Maintain with balanced diet.",
+                warningOverweight: "Warning: Overweight",
+                warningOverweightText: "You are overweight. Risk of heart disease increases.",
+                warningObese: "SERIOUS WARNING: Obesity",
+                warningObeseText: "You are obese. High risk of heart disease, stroke, diabetes.",
+                whtrTitle: "Waist-to-Height Ratio (WHtR)",
+                whtrIdeal: "Ideal", whtrHigh: "High", whtrVeryHigh: "Very High",
+                whtrRiskLow: "Low risk of metabolic diseases.",
+                whtrRiskHigh: "⚠️ Increased risk. Pay attention to diet and exercise more.",
+                whtrRiskVeryHigh: "🚨 High risk of heart disease, diabetes, and hypertension.",
+                whtrInputTitle: "Enter Waist Circumference",
+                whtrInputDesc: "Measure your waist at belly button level.",
+                whtrLabel: "Waist (cm)",
+                whtrCancel: "Cancel", whtrSave: "Save", whtrUpdate: "Update Waist",
+                reminderDisabledText: "Reminder is off. Enable to set time.",
+                reminderEnabledText: "Reminder enabled", reminderDisabledTextShort: "Reminder disabled"
+            }
+        };
+        
+        function t(key) { return translations[currentLanguage][key] || key; }
+        
+        function updateAllTexts() {
+            // Sidebar
+            document.getElementById('menuProfile').innerText = t('menuProfile');
+            document.getElementById('menuSettings').innerText = t('menuSettings');
+            document.getElementById('menuTarget').innerText = t('menuTarget');
+            document.getElementById('menuReminder').innerText = t('menuReminder');
+            document.getElementById('menuArtikel').innerText = t('menuArtikel');
+            document.getElementById('menuAI').innerText = t('menuAI');
+            document.getElementById('menuLogout').innerText = t('menuLogout');
+            
+            // Profile modal
+            document.getElementById('profileModalTitle').innerHTML = `<i class="fas fa-user-circle"></i> ${t('profileTitle')}`;
+            document.getElementById('profileNameLabel').innerText = t('profileNameLabel');
+            document.getElementById('profileEmailLabel').innerText = t('profileEmailLabel');
+            document.getElementById('profileCloseBtn').innerText = t('profileCloseBtn');
+            
+            // Settings modal
+            document.getElementById('settingsModalTitle').innerHTML = `<i class="fas fa-sliders-h"></i> ${t('settingsTitle')}`;
+            document.getElementById('darkModeLabel').innerHTML = `<i class="fas fa-moon"></i> ${t('darkModeLabel')}`;
+            document.getElementById('languageLabel').innerHTML = `<i class="fas fa-language"></i> ${t('languageLabel')}`;
+            document.getElementById('settingsSaveBtn').innerText = t('settingsSaveBtn');
+            
+            // Target modal
+            document.getElementById('targetModalTitle').innerHTML = `<i class="fas fa-bullseye"></i> ${t('targetTitle')}`;
+            document.getElementById('targetModalDesc').innerText = t('targetModalDesc');
+            document.getElementById('targetCancelBtn').innerText = t('targetCancelBtn');
+            document.getElementById('targetSaveBtn').innerText = t('targetSaveBtn');
+            
+            // Reminder modal
+            document.getElementById('reminderModalTitle').innerHTML = `<i class="fas fa-bell"></i> ${t('reminderModalTitle')}`;
+            document.getElementById('reminderStatusLabel').innerHTML = `<i class="fas fa-power-off"></i> ${t('reminderStatusLabel')}`;
+            document.getElementById('reminderTimeLabel').innerHTML = t('reminderTimeLabel');
+            document.getElementById('reminderCancelBtn').innerText = t('reminderCancelBtn');
+            document.getElementById('reminderSaveBtn').innerText = t('reminderSaveBtn');
+            document.getElementById('reminderDisabledText').innerText = t('reminderDisabledText');
+            
+            // Payment modal
+            document.getElementById('paymentTitle').innerHTML = `<i class="fas fa-receipt"></i> ${t('paymentTitle')}`;
+            document.getElementById('paymentCloseBtn').innerText = t('paymentCloseBtn');
+            
+            // Footer
+            document.getElementById('footerAbout').innerText = t('footerAbout');
+            document.getElementById('footerFaq').innerText = t('footerFaq');
+            document.getElementById('footerTerms').innerText = t('footerTerms');
+            document.getElementById('footerPrivacy').innerText = t('footerPrivacy');
+            document.getElementById('footerCopyright').innerText = t('footerCopyright');
+            
+            // Modal titles
+            document.getElementById('faqTitle').innerText = t('faqTitle');
+            document.getElementById('faqCloseBtn').innerText = t('faqCloseBtn');
+            document.getElementById('aboutTitle').innerText = t('aboutTitle');
+            document.getElementById('aboutCloseBtn').innerText = t('aboutCloseBtn');
+            document.getElementById('termsTitle').innerText = t('termsTitle');
+            document.getElementById('termsCloseBtn').innerText = t('termsCloseBtn');
+            document.getElementById('privacyTitle').innerText = t('privacyTitle');
+            document.getElementById('privacyCloseBtn').innerText = t('privacyCloseBtn');
+            
+            // WHtR modal
+            document.getElementById('whrModalTitle').innerHTML = `<i class="fas fa-tape"></i> ${t('whtrInputTitle')}`;
+            document.getElementById('whrModalDesc').innerText = t('whtrInputDesc');
+            document.getElementById('whrLabel').innerText = t('whtrLabel');
+            document.getElementById('whrCancelBtn').innerText = t('whtrCancel');
+            document.getElementById('whrSaveBtn').innerText = t('whtrSave');
+            
+            // Goal buttons
+            const loseBtn = document.querySelector('.goal-btn:first-child');
+            const gainBtn = document.querySelector('.goal-btn:last-child');
+            if (loseBtn) loseBtn.innerText = t('loseWeight');
+            if (gainBtn) gainBtn.innerText = t('gainWeight');
+            
+            // Update modal contents
+            updateFaqContent();
+            updateAboutContent();
+            updateTermsContent();
+            updatePrivacyContent();
+            
+            if (userData) loadDashboard();
+        }
+        
+        function updateFaqContent() {
+            const faqBody = document.getElementById('faqBody');
+            if (!faqBody) return;
+            
+            if (currentLanguage === 'id') {
+                faqBody.innerHTML = `
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ Apa itu HealthCare+?</h4><p>Platform kesehatan digital dengan BMI, WHtR, rekomendasi WHO, tracking aktivitas, dan AI 24/7.</p></div>
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ Apakah data saya aman?</h4><p>Ya, enkripsi AES-256 untuk melindungi data Anda.</p></div>
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ Apa itu WHtR?</h4><p>Rasio pinggang-tinggi. Nilai < 0.5 = risiko rendah.</p></div>
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ Apakah rekomendasi berbasis penelitian?</h4><p>Ya, dari WHO, ACSM, FAO.</p></div>
+                    <div><h4 style="color:#4f46e5;">❓ Kontak support?</h4><p>Email: <strong>careurhealth.support@gmail.com</strong></p></div>
+                `;
+            } else {
+                faqBody.innerHTML = `
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ What is HealthCare+?</h4><p>Digital health platform with BMI, WHtR, WHO recommendations, activity tracking, and 24/7 AI.</p></div>
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ Is my data safe?</h4><p>Yes, AES-256 encryption protects your data.</p></div>
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ What is WHtR?</h4><p>Waist-to-Height Ratio. Value < 0.5 = low risk.</p></div>
+                    <div style="margin-bottom:20px;"><h4 style="color:#4f46e5;">❓ Are recommendations research-based?</h4><p>Yes, from WHO, ACSM, FAO.</p></div>
+                    <div><h4 style="color:#4f46e5;">❓ Contact support?</h4><p>Email: <strong>careurhealth.support@gmail.com</strong></p></div>
+                `;
+            }
+        }
+        
+        function updateAboutContent() {
+            const aboutBody = document.getElementById('aboutBody');
+            if (!aboutBody) return;
+            
+            if (currentLanguage === 'id') {
+                aboutBody.innerHTML = `
+                    <p><strong>HealthCare+</strong> adalah platform kesehatan digital.</p>
+                    <h4 style="color:#4f46e5;">🏥 Visi</h4><p>Mitra kesehatan digital terpercaya.</p>
+                    <h4 style="color:#4f46e5;">🎯 Misi</h4><ul><li>Tools BMI, WHtR akurat</li><li>Rekomendasi WHO/ACSM/FAO</li><li>AI 24/7</li></ul>
+                    <h4 style="color:#4f46e5;">📊 Sumber Data</h4><p>WHO, ACSM, FAO</p>
+                `;
+            } else {
+                aboutBody.innerHTML = `
+                    <p><strong>HealthCare+</strong> is a digital health platform.</p>
+                    <h4 style="color:#4f46e5;">🏥 Vision</h4><p>Trusted digital health partner.</p>
+                    <h4 style="color:#4f46e5;">🎯 Mission</h4><ul><li>Accurate BMI, WHtR tools</li><li>WHO/ACSM/FAO recommendations</li><li>24/7 AI</li></ul>
+                    <h4 style="color:#4f46e5;">📊 Data Sources</h4><p>WHO, ACSM, FAO</p>
+                `;
+            }
+        }
+        
+        function updateTermsContent() {
+            const termsBody = document.getElementById('termsBody');
+            if (!termsBody) return;
+            
+            if (currentLanguage === 'id') {
+                termsBody.innerHTML = `<h4 style="color:#4f46e5;">1. Penggunaan Layanan</h4><p>Pengguna bertanggung jawab atas data.</p><h4 style="color:#4f46e5;">2. Disclaimer Medis</h4><p><strong>BUKAN</strong> pengganti konsultasi dokter.</p><h4 style="color:#4f46e5;">3. Perubahan</h4><p>Ketentuan dapat berubah.</p>`;
+            } else {
+                termsBody.innerHTML = `<h4 style="color:#4f46e5;">1. Service Usage</h4><p>Users responsible for data.</p><h4 style="color:#4f46e5;">2. Medical Disclaimer</h4><p><strong>NOT</strong> a substitute for doctor consultation.</p><h4 style="color:#4f46e5;">3. Changes</h4><p>Terms may change.</p>`;
+            }
+        }
+        
+        function updatePrivacyContent() {
+            const privacyBody = document.getElementById('privacyBody');
+            if (!privacyBody) return;
+            
+            if (currentLanguage === 'id') {
+                privacyBody.innerHTML = `<h4 style="color:#4f46e5;">📋 Data Dikumpulkan</h4><ul><li>Nama, email</li><li>Usia, berat, tinggi, lingkar pinggang</li></ul><h4 style="color:#4f46e5;">🔒 Keamanan</h4><p>Enkripsi AES-256</p><h4 style="color:#4f46e5;">📧 Kontak</h4><p>careurhealth.support@gmail.com</p>`;
+            } else {
+                privacyBody.innerHTML = `<h4 style="color:#4f46e5;">📋 Data Collected</h4><ul><li>Name, email</li><li>Age, weight, height, waist</li></ul><h4 style="color:#4f46e5;">🔒 Security</h4><p>AES-256 encryption</p><h4 style="color:#4f46e5;">📧 Contact</h4><p>careurhealth.support@gmail.com</p>`;
+            }
+        }
+        
+        function changeLanguage() {
+            const select = document.getElementById('languageSelect');
+            currentLanguage = select.value;
+            localStorage.setItem('language', currentLanguage);
+            updateAllTexts();
+            showToast(currentLanguage === 'id' ? 'Bahasa diubah' : 'Language changed');
+        }
+        
+        function showToast(msg) { const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
+        
+        function toggleTheme() { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); }
+        
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+        
+        function setGoal(goal) {
+            currentGoal = goal;
+            localStorage.setItem('healthGoal', goal);
+            document.querySelectorAll('.goal-btn').forEach(btn => btn.classList.remove('active'));
+            if (goal === 'lose') document.querySelector('.goal-btn:first-child').classList.add('active');
+            else document.querySelector('.goal-btn:last-child').classList.add('active');
+            if (userData) loadDashboard();
+        }
+        
+        async function uploadAvatar(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('avatar', file);
+            try {
+                const res = await fetch('/api/upload-avatar', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('avatarIcon').style.display = 'none';
+                    const img = document.getElementById('avatarImg');
+                    img.style.display = 'block';
+                    img.src = data.avatarUrl + '?t=' + Date.now();
+                    showToast('Avatar updated!');
+                }
+            } catch(err) { showToast('Upload failed'); }
+        }
+        
+        async function loadAvatar() {
+            try {
+                const res = await fetch('/api/user-avatar');
+                const data = await res.json();
+                if (data.avatar) {
+                    document.getElementById('avatarIcon').style.display = 'none';
+                    document.getElementById('avatarImg').style.display = 'block';
+                    document.getElementById('avatarImg').src = data.avatar;
+                }
+            } catch(e) {}
+        }
+        
+        function openProfileModal() { 
+            document.getElementById('profileName').innerText = userData?.nama || '-';
+            document.getElementById('profileEmail').innerText = userData?.email || '-';
+            document.getElementById('profileModal').classList.add('active');
+        }
+        function closeProfileModal() { document.getElementById('profileModal').classList.remove('active'); }
+        
+        function openSettingsModal() { 
+            document.getElementById('darkModeToggle').checked = document.body.classList.contains('dark');
+            document.getElementById('languageSelect').value = currentLanguage;
+            document.getElementById('settingsModal').classList.add('active');
+        }
+        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
+        
+        function setTargetModal() { document.getElementById('targetCalories').value = dailyTarget; document.getElementById('targetModal').classList.add('active'); }
+        function closeTargetModal() { document.getElementById('targetModal').classList.remove('active'); }
+        function saveTarget() { const val = parseInt(document.getElementById('targetCalories').value); if (val > 0) { dailyTarget = val; localStorage.setItem('dailyTarget', dailyTarget); showToast(t('save')); closeTargetModal(); loadDashboard(); } }
+        
+        function openReminderSettings() {
+            const hourSelect = document.getElementById('reminderHourSelect');
+            hourSelect.innerHTML = '';
+            for (let i = 0; i < 24; i++) { const opt = document.createElement('option'); opt.value = i; opt.textContent = i.toString().padStart(2,'0'); if (i === reminderHour) opt.selected = true; hourSelect.appendChild(opt); }
+            const minuteSelect = document.getElementById('reminderMinuteSelect');
+            minuteSelect.innerHTML = '';
+            for (let i = 0; i < 60; i++) { const opt = document.createElement('option'); opt.value = i; opt.textContent = i.toString().padStart(2,'0'); if (i === reminderMinute) opt.selected = true; minuteSelect.appendChild(opt); }
+            document.getElementById('reminderToggleSwitch').checked = reminderEnabled;
+            const timeSection = document.getElementById('reminderTimeSection');
+            const disabledMsg = document.getElementById('reminderDisabledMessage');
+            if (reminderEnabled) { timeSection.style.display = 'block'; disabledMsg.style.display = 'none'; }
+            else { timeSection.style.display = 'none'; disabledMsg.style.display = 'block'; }
+            document.getElementById('reminderSettingsModal').classList.add('active');
+        }
+        function closeReminderModal() { document.getElementById('reminderSettingsModal').classList.remove('active'); }
+        function saveReminderSettings() {
+            reminderEnabled = document.getElementById('reminderToggleSwitch').checked;
+            if (reminderEnabled) { reminderHour = parseInt(document.getElementById('reminderHourSelect').value); reminderMinute = parseInt(document.getElementById('reminderMinuteSelect').value); }
+            localStorage.setItem('reminderEnabled', reminderEnabled); localStorage.setItem('reminderHour', reminderHour); localStorage.setItem('reminderMinute', reminderMinute);
+            showToast(reminderEnabled ? t('reminderEnabledText') : t('reminderDisabledTextShort'));
+            closeReminderModal();
+        }
+        
+        function openAIChat() { window.open('/ai-chat', '_blank'); }
+        
+        function openWHRModal() { document.getElementById('whrModal').classList.add('active'); }
+        function closeWHRModal() { document.getElementById('whrModal').classList.remove('active'); }
+        
+        async function saveWaist() {
+            const waist = document.getElementById('lingkarPinggang').value;
+            if (!waist || waist < 50 || waist > 300) { showToast('Enter valid waist (50-300 cm)', 'error'); return; }
+            try {
+                const res = await fetch('/api/update-waist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lingkar_pinggang: parseFloat(waist) }) });
+                const data = await res.json();
+                if (data.success) { showToast('Waist data saved!'); closeWHRModal(); loadDashboard(); }
+                else showToast(data.error, 'error');
+            } catch(err) { showToast('Save failed', 'error'); }
+        }
+        
+        async function saveWaistFromInput() {
+            const waist = document.getElementById('waistInput')?.value;
+            if (!waist || waist < 50 || waist > 300) { showToast('Enter valid waist (50-300 cm)', 'error'); return; }
+            try {
+                const res = await fetch('/api/update-waist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lingkar_pinggang: parseFloat(waist) }) });
+                const data = await res.json();
+                if (data.success) { showToast('Waist data saved!'); loadDashboard(); }
+                else showToast(data.error, 'error');
+            } catch(err) { showToast('Save failed', 'error'); }
+        }
+        
+        async function exportPDF() { showToast('Creating PDF...'); try { window.open('/api/export-pdf', '_blank'); } catch(err) { showToast('PDF failed', 'error'); } }
+        
+        async function loadUser() {
+            try { const res = await fetch('/api/user'); if (res.status === 401) { window.location.href = '/login'; return; } userData = await res.json(); 
+            document.getElementById('sidebarName').innerHTML = userData.nama; document.getElementById('sidebarEmail').innerHTML = userData.email; 
+            if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark'); 
+            loadAvatar(); loadDashboard(); } catch(err) { window.location.href = '/login'; }
+        }
+        
+        async function loadDashboard() {
+            const healthRes = await fetch(`/api/health-status?lang=${currentLanguage}`); const health = await healthRes.json(); 
+            const todayRes = await fetch('/api/today-activity'); const todayAct = await todayRes.json(); 
+            const historyRes = await fetch('/api/history'); let history = await historyRes.json(); 
+            const chartRes = await fetch('/api/health-history'); const chartData = await chartRes.json();
+            const whtrRes = await fetch('/api/whr'); const whtrData = await whtrRes.json();
+            
+            if (!health.hasData) { 
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="form-card"><h2><i class="fas fa-notes-medical"></i> ${t('healthStatus')}</h2>
+                    <div class="form-group"><label>${t('age')}</label><input type="number" id="umur" placeholder="${t('agePlaceholder')}"></div>
+                    <div class="form-group"><label>${t('weight')} (kg)</label><input type="number" id="berat" step="0.1" placeholder="70"></div>
+                    <div class="form-group"><label>${t('height')} (cm)</label><input type="number" id="tinggi" step="0.1" placeholder="170"></div>
+                    <button class="btn-save" onclick="saveHealthData()"><i class="fas fa-save"></i> ${t('save')}</button></div>`;
+                return; 
+            }
+            
+            let streak = 0, totalCaloriesMonth = 0; const currentMonth = new Date().toISOString().slice(0, 7);
+            for (let i = 0; i < history.length; i++) { if (history[i].olahraga) streak++; else break; if (history[i].tanggal.startsWith(currentMonth)) totalCaloriesMonth += history[i].kalori_terbakar || 0; }
+            const todayCalories = todayAct?.kalori_terbakar || 0; const progressPercent = Math.min(100, Math.round((todayCalories / dailyTarget) * 100));
+            const totalActivities = history.filter(h => h.tanggal.startsWith(currentMonth)).length; const avgCalories = totalActivities > 0 ? Math.round(totalCaloriesMonth / totalActivities) : 0;
+            
+            const weeklyCalorieDeficit = dailyTarget * 7;
+            const weeklyWeightChange = (weeklyCalorieDeficit / 7700).toFixed(2);
+            const monthlyWeightChange = (weeklyWeightChange * 4).toFixed(2);
+            
+            const last7Days = [], calories7Days = [];
+            for (let i = 6; i >= 0; i--) { const date = new Date(); date.setDate(date.getDate() - i); const dateStr = date.toISOString().split('T')[0]; last7Days.push(dateStr.slice(5)); const activity = history.find(h => h.tanggal === dateStr); calories7Days.push(activity ? (activity.kalori_terbakar || 0) : 0); }
+            
+            let historyHtml = ''; if (history.length === 0) historyHtml = `<p style="text-align:center; padding:20px;">${t('noData')}</p>`; 
+            else for (let h of history.slice(0, 30)) historyHtml += `<div class="history-item">${h.tanggal} - ${h.olahraga} (${h.durasi_menit} ${t('minutes')}) - ${(h.kalori_terbakar || 0).toLocaleString()} ${t('calories')}</div>`;
+            
+            let checkinHtml = todayAct?.olahraga ? `
+                <div class="today-status">✅ ${t('todayCheckin')} ${todayAct.olahraga} (${todayAct.durasi_menit} ${t('minutes')})<span>Total ${todayCalories.toLocaleString()} ${t('calories')} ${t('fromTarget')} ${dailyTarget.toLocaleString()}</span></div>
+                <div class="exercise-card"><div class="exercise-title">${t('addActivityButton')}</div><div class="exercise-input-group"><input type="text" id="olahraga" placeholder="${t('exercisePlaceholder')}"><input type="number" id="durasi" placeholder="${t('durationPlaceholder')}"></div><button class="exercise-btn" onclick="checkin()">${t('checkinButton')}</button></div>
+            ` : `<div class="exercise-card"><div class="exercise-title">${t('checkinButton')} ${t('exercise')}</div><div class="exercise-input-group"><input type="text" id="olahraga" placeholder="${t('exercisePlaceholder')}"><input type="number" id="durasi" placeholder="${t('durationPlaceholder')}"></div><button class="exercise-btn" onclick="checkin()">${t('checkinButton')}</button></div>`;
+            
+            const loseTips = ["Reduce sugar and refined carbs", "Eat more protein", "Drink water before meals", "Sleep 7-8 hours", "Combine cardio with strength"];
+            const gainTips = ["Increase meal portions gradually", "Eat quality protein", "Do weight training 3-4x/week", "Eat more frequently (5-6x/day)", "Eat complex carbs"];
+            const randomTip = currentGoal === 'lose' ? loseTips[Math.floor(Math.random() * loseTips.length)] : gainTips[Math.floor(Math.random() * gainTips.length)];
+            const randomTip2 = currentGoal === 'lose' ? loseTips[Math.floor(Math.random() * loseTips.length)] : gainTips[Math.floor(Math.random() * gainTips.length)];
+            
+            const predictionTitle = currentGoal === 'lose' ? t('weightLossPrediction') : t('weightGainPrediction');
+            const arrow = currentGoal === 'lose' ? '↓ ' : '↑ ';
+            const color = currentGoal === 'lose' ? '#10b981' : '#f59e0b';
+            
+            let warningClass = '', warningIcon = '', warningTitle = '', warningText = '';
+            if (health.bmi < 18.5) { warningClass = 'warning-underweight'; warningIcon = '⚠️'; warningTitle = t('warningUnderweight'); warningText = t('warningUnderweightText'); }
+            else if (health.bmi >= 18.5 && health.bmi < 25) { warningClass = 'warning-normal'; warningIcon = '✅'; warningTitle = t('warningNormal'); warningText = t('warningNormalText'); }
+            else if (health.bmi >= 25 && health.bmi < 30) { warningClass = 'warning-overweight'; warningIcon = '⚠️'; warningTitle = t('warningOverweight'); warningText = t('warningOverweightText'); }
+            else { warningClass = 'warning-obese'; warningIcon = '🚨'; warningTitle = t('warningObese'); warningText = t('warningObeseText'); }
+            
+            let bmiStatusColor = '#f59e0b';
+            if (health.status === 'Normal') bmiStatusColor = '#10b981';
+            else if (health.status === 'Obesitas' || health.status === 'Obese') bmiStatusColor = '#ef4444';
+            
+            let whtrHtml = '';
+            if (whtrData.hasData) {
+                let whtrStatus = '', whtrRisk = '', whtrColor = '';
+                if (whtrData.whtr < 0.5) { whtrStatus = t('whtrIdeal'); whtrRisk = t('whtrRiskLow'); whtrColor = '#10b981'; }
+                else if (whtrData.whtr < 0.6) { whtrStatus = t('whtrHigh'); whtrRisk = t('whtrRiskHigh'); whtrColor = '#f59e0b'; }
+                else { whtrStatus = t('whtrVeryHigh'); whtrRisk = t('whtrRiskVeryHigh'); whtrColor = '#ef4444'; }
+                whtrHtml = `<div class="card"><div class="card-header"><h2><i class="fas fa-tape"></i> ${t('whtrTitle')}</h2></div><div class="bmi-box"><div class="bmi-value" style="color:${whtrColor}">${whtrData.whtr}</div><div class="bmi-status" style="background:${whtrColor}20; color:${whtrColor}">${whtrStatus}</div></div><p style="font-size:12px;">${whtrRisk}</p><div class="metrics-grid"><div class="metric-card"><div class="metric-label">Waist</div><div class="metric-value">${whtrData.lingkarPinggang} cm</div></div><div class="metric-card"><div class="metric-label">Height</div><div class="metric-value">${whtrData.tinggi} cm</div></div></div><button class="btn-secondary" onclick="openWHRModal()"><i class="fas fa-edit"></i> ${t('whtrUpdate')}</button></div>`;
+            } else {
+                whtrHtml = `<div class="whr-input-card"><h3><i class="fas fa-tape"></i> ${t('whtrTitle')}</h3><p style="font-size:12px; margin-bottom:12px;">WHtR = Waist / Height. Target: < 0.5</p><div class="whr-input-group"><div class="form-group" style="flex:1;"><label>${t('whtrLabel')}</label><input type="number" id="waistInput" step="0.1" placeholder="85"></div><button class="btn-save" style="margin-bottom:0; width:auto; padding:12px 24px;" onclick="saveWaistFromInput()">${t('whtrSave')}</button></div></div>`;
+            }
+            
+            document.getElementById('mainContent').innerHTML = `
+                <div class="goal-toggle"><button class="goal-btn ${currentGoal === 'lose' ? 'active' : ''}" onclick="setGoal('lose')">${t('loseWeight')}</button><button class="goal-btn ${currentGoal === 'gain' ? 'active' : ''}" onclick="setGoal('gain')">${t('gainWeight')}</button></div>
+                <div class="quote-card"><div class="quote-text">"${currentQuote.text}"</div><div class="quote-author">— ${currentQuote.author}</div></div>
+                <div class="welcome-row"><div class="welcome-text"><h1>${t('hello')}, ${health.nama}! 👋</h1><p>${t('dataBased')}</p></div><div class="streak-card"><div class="streak-number">${streak}</div><div class="streak-label">${t('bestStreak')}</div></div></div>
+                <div class="badges-row"><div class="badge-card"><div class="badge-icon fire">🔥</div><div><h4>${streak}</h4><p>${t('bestStreak')}</p></div></div><div class="badge-card"><div class="badge-icon calorie">📊</div><div><h4>${totalCaloriesMonth.toLocaleString()}</h4><p>${t('caloriesThisMonth')}</p></div></div></div>
+                <div class="progress-section"><div class="progress-header">${t('progressToday')}: ${todayCalories.toLocaleString()} / ${dailyTarget.toLocaleString()} ${t('calories')}</div><div class="progress-bar-container"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div><div class="target-set">🎯 ${t('dailyTarget')}: ${dailyTarget} ${t('calories')} <span onclick="setTargetModal()">(${t('change')})</span></div></div>
+                <div class="summary-card"><h3>${t('summaryThisMonth')}</h3><div class="summary-stats"><div class="summary-stat"><div class="value">${totalActivities}</div><div class="label">${t('exerciseDays')}</div></div><div class="summary-stat"><div class="value">${totalCaloriesMonth.toLocaleString()}</div><div class="label">${t('caloriesBurned')}</div></div><div class="summary-stat"><div class="value">${avgCalories}</div><div class="label">${t('averagePerDay')}</div></div></div></div>
+                <div class="card"><div class="card-header"><h2>${t('healthStatus')}</h2></div><div class="bmi-box"><div class="bmi-value" style="color:${bmiStatusColor}">${health.bmi}</div><div class="bmi-status" style="background:${bmiStatusColor}20; color:${bmiStatusColor}">${health.statusIcon} ${health.status}</div></div><div class="warning-card ${warningClass}"><i class="fas ${warningIcon === '✅' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i><div class="warning-content"><div class="warning-title">${warningTitle}</div><div class="warning-text">${warningText}</div></div></div><p style="font-size:12px;">${health.statusPesan}</p><div class="metrics-grid"><div class="metric-card"><div class="metric-label">${t('weight')}</div><div class="metric-value">${health.berat} kg</div></div><div class="metric-card"><div class="metric-label">${t('height')}</div><div class="metric-value">${health.tinggi} cm</div></div></div><div class="research-note"><i class="fas fa-flask"></i> <strong>${t('source')}:</strong> WHO, ACSM, FAO</div><button class="btn-secondary" onclick="openEditDataModal(${health.berat}, ${health.tinggi})"><i class="fas fa-edit"></i> ${t('editDataBtn')}</button></div>
+                ${whtrHtml}
+                <div class="card"><div class="card-header"><h2>${t('exerciseRecommendation')}</h2></div><div class="rekom-box"><p><strong>🏃 ${t('exercise')}:</strong> ${health.rekomendasiOlahraga}</p><p><strong>📅 ${t('frequency')}:</strong> ${health.rekomendasiFrekuensi}</p><p class="small-text">💡 ${t('tip')}: ${health.rekomendasiTips}</p></div></div>
+                <div class="card"><div class="card-header"><h2>${t('nutritionRecommendation')}</h2></div><div class="rekom-box"><p>🌅 ${t('breakfast')}: ${health.rekomendasiMakanan?.sarapan}</p><p>☀️ ${t('lunch')}: ${health.rekomendasiMakanan?.makanSiang}</p><p>🌙 ${t('dinner')}: ${health.rekomendasiMakanan?.makanMalam}</p><p class="small-text">💡 ${t('tip')}: ${health.rekomendasiMakanan?.tips}</p></div></div>
+                <div class="prediction-card"><div class="prediction-title"><i class="fas fa-chart-line"></i> ${predictionTitle}</div><div class="prediction-value" style="color:${color}">${arrow}${weeklyWeightChange} kg / week</div><div class="prediction-detail">📊 ${t('calorieInfo')} <strong>${dailyTarget.toLocaleString()} calories/day</strong></div><div class="prediction-detail">📅 ${t('weeklyPrediction')} ${arrow}${weeklyWeightChange} kg</div><div class="prediction-detail">📆 ${t('monthlyPrediction')} ${arrow}${monthlyWeightChange} kg</div><div class="prediction-detail">💡 1 kg fat = 7,700 calories (Source: ACSM, WHO)</div></div>
+                <div class="suggestion-card"><div class="suggestion-title"><i class="fas fa-lightbulb"></i> ${currentGoal === 'lose' ? t('tipsLose') : t('tipsGain')}</div><div class="suggestion-text">${randomTip}</div><div class="suggestion-text" style="margin-top:8px;"><i class="fas fa-sync-alt"></i> ${randomTip2}</div></div>
+                <div class="card"><div class="card-header"><h2>${t('todayActivity')}</h2></div>${checkinHtml}</div>
+                <div class="card"><div class="card-header"><h2>${t('weeklyCaloriesTrend')}</h2></div><div class="chart-container"><canvas id="caloriesChart"></canvas></div></div>
+                <div class="card"><div class="card-header"><h2>${t('weightProgress')}</h2></div>${chartData.length > 0 ? `<div class="chart-container"><canvas id="weightChart"></canvas></div>` : `<p style="text-align:center; padding:20px;">${t('noData')}</p>`}</div>
+                <div class="card"><div class="card-header"><h2>30-Day History</h2><button class="btn-export-pdf" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> ${t('exportCSV')}</button></div><div class="history-list">${historyHtml}</div></div>
+            `;
+            
+            const ctxCal = document.getElementById('caloriesChart')?.getContext('2d');
+            if (ctxCal) { if (caloriesChart) caloriesChart.destroy(); caloriesChart = new Chart(ctxCal, { type: 'bar', data: { labels: last7Days, datasets: [{ label: t('caloriesBurned'), data: calories7Days, backgroundColor: '#f59e0b', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true } }); }
+            if (chartData.length > 0) { const ctxWeight = document.getElementById('weightChart')?.getContext('2d'); if (ctxWeight) { if (healthChart) healthChart.destroy(); healthChart = new Chart(ctxWeight, { type: 'line', data: { labels: chartData.map(d => d.tanggal.slice(5)), datasets: [{ label: `${t('weight')} (kg)`, data: chartData.map(d => d.berat_badan), borderColor: '#4f46e5', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: true } }); } }
+            if (health.premiumExercise) { const featureCard = document.createElement('div'); featureCard.className = 'feature-card'; featureCard.innerHTML = `<h2><i class="fas fa-crown" style="color:#f59e0b;"></i> Advanced Recommendations</h2><div class="feature-content"><p><strong>💎 Advanced Exercise</strong></p><p>${health.premiumExercise.olahraga}</p><p>${health.premiumExercise.detail}</p><p>💡 ${health.premiumExercise.tips}</p></div><div class="feature-content"><p><strong>💡 Health Tip</strong></p><p>${health.premiumTip}</p></div>`; document.getElementById('mainContent').appendChild(featureCard); }
+        }
+        
+        function showFaqModal() { document.getElementById('faqModal').classList.add('active'); }
+        function closeFaqModal() { document.getElementById('faqModal').classList.remove('active'); }
+        function showAboutModal() { document.getElementById('aboutModal').classList.add('active'); }
+        function closeAboutModal() { document.getElementById('aboutModal').classList.remove('active'); }
+        function showTermsModal() { document.getElementById('termsModal').classList.add('active'); }
+        function closeTermsModal() { document.getElementById('termsModal').classList.remove('active'); }
+        function showPrivacyModal() { document.getElementById('privacyModal').classList.add('active'); }
+        function closePrivacyModal() { document.getElementById('privacyModal').classList.remove('active'); }
+        
+        async function saveHealthData() { const umur = document.getElementById('umur')?.value, berat = document.getElementById('berat')?.value, tinggi = document.getElementById('tinggi')?.value; if (!umur || !berat || !tinggi) return; await fetch('/api/update-health', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ umur: parseInt(umur), berat_badan: parseFloat(berat), tinggi_badan: parseFloat(tinggi) }) }); showToast(t('save')); loadDashboard(); }
+        
+        function openEditDataModal(berat, tinggi) { const modal = document.createElement('div'); modal.className = 'modal'; modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; display:flex;'; modal.innerHTML = `<div style="background:white; border-radius:24px; width:90%; max-width:400px;"><div style="padding:20px; border-bottom:1px solid #e2e8f0;"><h3>${t('editData')}</h3></div><div style="padding:20px;"><input type="number" id="editBerat" step="0.1" value="${berat}" placeholder="${t('weight')} (kg)" style="width:100%; padding:12px; border-radius:12px; margin-bottom:16px;"><input type="number" id="editTinggi" step="0.1" value="${tinggi}" placeholder="${t('height')} (cm)" style="width:100%; padding:12px; border-radius:12px;"></div><div style="padding:16px 20px; text-align:right;"><button onclick="this.closest('.modal').remove()" style="padding:8px 20px; border-radius:40px; background:#e2e8f0; border:none; margin-right:10px;">${t('cancel')}</button><button onclick="saveEditData(this.closest('.modal'))" style="padding:8px 20px; border-radius:40px; background:#4f46e5; color:white; border:none;">${t('save')}</button></div></div>`; document.body.appendChild(modal); }
+        async function saveEditData(modal) { const berat = modal.querySelector('#editBerat').value, tinggi = modal.querySelector('#editTinggi').value; if (!berat || !tinggi) return; await fetch('/api/update-health', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ umur: 25, berat_badan: parseFloat(berat), tinggi_badan: parseFloat(tinggi) }) }); showToast(t('save')); modal.remove(); loadDashboard(); }
+        
+        async function checkin() { const olahraga = document.getElementById('olahraga')?.value, durasi = document.getElementById('durasi')?.value; if (!olahraga || !durasi) { showToast('Fill exercise and duration'); return; } await fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ olahraga, durasi_menit: parseInt(durasi), catatan: '' }) }); showToast('Check-in successful!'); loadDashboard(); }
+        async function logout() { await fetch('/api/logout', { method: 'POST' }); localStorage.clear(); window.location.href = '/login'; }
+        
+        loadUser();
+        updateAllTexts();
+    </script>
+</body>
+  </html>
+  
